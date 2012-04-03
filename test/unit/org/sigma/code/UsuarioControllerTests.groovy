@@ -8,12 +8,16 @@ import grails.test.mixin.*
 @TestFor(UsuarioController)
 @Mock(Usuario)
 class UsuarioControllerTests {
-
-
+	
     def populateValidParams(params) {
-      assert params != null
-      // TODO: Populate valid properties like...
-      //params["name"] = 'someValidName'
+	  // TODO: Populate valid properties like...
+	  //params["name"] = 'someValidName'
+	  params["nombre"] = "Un Nombre"
+	  params["apellido"] = "Un Apellido"
+	  params["username"] = "Un username"
+	  params["password"] = "Un password"
+	  params["email"] = "unemail@valido.com"
+	  assert params != null
     }
 
     void testIndex() {
@@ -24,7 +28,7 @@ class UsuarioControllerTests {
     void testList() {
 
         def model = controller.list()
-
+		
         assert model.usuarioInstanceList.size() == 0
         assert model.usuarioInstanceTotal == 0
     }
@@ -46,7 +50,7 @@ class UsuarioControllerTests {
         populateValidParams(params)
         controller.save()
 
-        assert response.redirectedUrl == '/usuario/show/1'
+        assert response.redirectedUrl == '/usuario/show/0'
         assert controller.flash.message != null
         assert Usuario.count() == 1
     }
@@ -105,7 +109,8 @@ class UsuarioControllerTests {
 
         // test invalid parameters in update
         params.id = usuario.id
-        //TODO: add invalid values to params object
+		params.nombre = null
+        
 
         controller.update()
 

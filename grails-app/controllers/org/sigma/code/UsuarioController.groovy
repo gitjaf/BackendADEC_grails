@@ -12,13 +12,35 @@ class UsuarioController {
     }
 
     def list() {
-//        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-		render Usuario.list() as JSON
-//        [usuarioInstanceList: Usuario.list(params), usuarioInstanceTotal: Usuario.count()]
+		
+    	params.max = Math.min(params.max ? params.int('max') : 10, 100)
+		
+		def usuarios = Usuario.list()
+
+		withFormat{
+			
+    		html{
+    			[usuarioInstanceList: Usuario.list(params), usuarioInstanceTotal: Usuario.count()]
+    		}
+			
+			json{
+				if (params.callback) {
+					render (
+							text: "${params.callback}(${usuarios as JSON})",
+							contentType: "text/javascript",
+							encoding: "UTF-8"
+							)
+				} else {
+					render usuarios as JSON
+				}
+			}
+
+						
+		}
     }
 
     def create() {
-        [usuarioInstance: new Usuario(params)]
+		[usuarioInstance: new Usuario(params)]
     }
 
     def save() {
@@ -34,24 +56,61 @@ class UsuarioController {
 
     def show() {
         def usuarioInstance = Usuario.get(params.id)
-        if (!usuarioInstance) {
+        
+		if (!usuarioInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [message(code: 'usuario.label', default: 'Usuario'), params.id])
             redirect(action: "list")
             return
         }
+		
+		withFormat{
 
-        [usuarioInstance: usuarioInstance]
+			html{
+				[usuarioInstance: usuarioInstance]
+			}
+			
+			json{
+				if (params.callback) {
+					render (
+							text: "${params.callback}(${usuarioInstance as JSON})",
+							contentType: "text/javascript",
+							encoding: "UTF-8"
+							)
+				} else {
+					render usuarioInstance as JSON
+				}
+			}
+		}
     }
 
     def edit() {
+		
         def usuarioInstance = Usuario.get(params.id)
         if (!usuarioInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'usuario.label', default: 'Usuario'), params.id])
             redirect(action: "list")
             return
         }
+		
+		withFormat{
+			
+			html{
+				[usuarioInstance: usuarioInstance]
+			}
 
-        [usuarioInstance: usuarioInstance]
+			json{
+				if (params.callback) {
+					render (
+							text: "${params.callback}(${usuarioInstance as JSON})",
+							contentType: "text/javascript",
+							encoding: "UTF-8"
+							)
+				} else {
+					render usuarioInstance as JSON
+				}
+			}
+		}
+        
     }
 
     def update() {

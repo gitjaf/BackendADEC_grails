@@ -19,11 +19,11 @@ class Usuario {
 		username(required: true)
 		password(required: true)
 		email(required: true)
-//		localidad(nullable: true)
-//		direccion(nullable: true)
-//		telefono(nullable: true)
-//		empresa(nullable: true)
-//		
+		localidad(nullable: true)
+		direccion(nullable: true)
+		telefono(nullable: true)
+		empresa(nullable: true)
+		
     }
 	
 	
