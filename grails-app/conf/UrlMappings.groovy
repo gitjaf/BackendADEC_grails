@@ -9,12 +9,12 @@ class UrlMappings {
 		
 		"/usuarios"{
 			controller = 'usuario'
-			action = [GET: "list"]
+			action = [GET: "list", POST: "save"]
 		}
 		
 		"/usuarios/${id}"{
 			controller = 'usuario'
-			action = [GET: "show"]
+			action = [GET: "show", DELETE: "delete", PUT: "update"]
 			
 		}
 		

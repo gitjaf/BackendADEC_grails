@@ -5,7 +5,7 @@ import grails.converters.JSON
 
 class UsuarioController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [show:['GET', 'POST'], save: "POST", update: "PUT", delete: "DELETE"]
 
     def index() {
         redirect(action: "list", params: params)
@@ -13,7 +13,7 @@ class UsuarioController {
 
     def list() {
 		
-    	params.max = Math.min(params.max ? params.int('max') : 10, 100)
+    	params.max = Math.min(params.max ? params.int('max') : 20, 100)
 		
 		def usuarios = Usuario.list()
 
@@ -51,7 +51,16 @@ class UsuarioController {
         }
 
 		flash.message = message(code: 'default.created.message', args: [message(code: 'usuario.label', default: 'Usuario'), usuarioInstance.id])
-        redirect(action: "show", id: usuarioInstance.id)
+        
+		withFormat{
+			html{
+				redirect(action: "show", id: usuarioInstance.id)
+			}
+			json{
+				response.status = 201
+				render flash.message
+			}
+		}
     }
 
     def show() {
@@ -140,7 +149,16 @@ class UsuarioController {
         }
 
 		flash.message = message(code: 'default.updated.message', args: [message(code: 'usuario.label', default: 'Usuario'), usuarioInstance.id])
-        redirect(action: "show", id: usuarioInstance.id)
+        
+		withFormat{
+			html{
+				redirect(action: "show", id: usuarioInstance.id)
+			}
+			json{
+				response.status = 200
+				render flash.message
+			}
+		}
     }
 
     def delete() {
@@ -154,11 +172,28 @@ class UsuarioController {
         try {
             usuarioInstance.delete(flush: true)
 			flash.message = message(code: 'default.deleted.message', args: [message(code: 'usuario.label', default: 'Usuario'), params.id])
-            redirect(action: "list")
+            
+			withFormat{
+				html{
+					redirect(action: "list")
+				}
+				json{
+					response.status = 200
+					render flash.message
+				}
+			}
         }
         catch (DataIntegrityViolationException e) {
 			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'usuario.label', default: 'Usuario'), params.id])
-            redirect(action: "show", id: params.id)
+            withFormat{
+				html{
+					redirect(action: "show", id: params.id)
+				}
+				json{
+					response.status = 500
+					render flash.message
+				}
+			}
         }
     }
 }
