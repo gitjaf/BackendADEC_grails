@@ -17,26 +17,16 @@ class UsuarioController {
 		
 		def usuarios = Usuario.list()
 
-		withFormat{
-			
-    		html{
-    			[usuarioInstanceList: Usuario.list(params), usuarioInstanceTotal: Usuario.count()]
-    		}
-			
-			json{
-				if (params.callback) {
-					render (
-							text: "${params.callback}(${usuarios as JSON})",
-							contentType: "text/javascript",
-							encoding: "UTF-8"
-							)
-				} else {
-					render usuarios as JSON
-				}
-			}
-
-						
+		if (params.callback) {
+			render (
+					text: "${params.callback}(${usuarios as JSON})",
+					contentType: "text/javascript",
+					encoding: "UTF-8"
+					)
+		} else {
+			render usuarios as JSON
 		}
+		
     }
 
     def create() {
@@ -52,15 +42,11 @@ class UsuarioController {
 
 		flash.message = message(code: 'default.created.message', args: [message(code: 'usuario.label', default: 'Usuario'), usuarioInstance.id])
         
-		withFormat{
-			html{
-				redirect(action: "show", id: usuarioInstance.id)
-			}
-			json{
-				response.status = 201
-				render flash.message
-			}
-		}
+		response.status = 201
+		render flash.message
+	
+	
+	
     }
 
     def show() {
@@ -72,24 +58,17 @@ class UsuarioController {
             return
         }
 		
-		withFormat{
-
-			html{
-				[usuarioInstance: usuarioInstance]
-			}
-			
-			json{
-				if (params.callback) {
-					render (
-							text: "${params.callback}(${usuarioInstance as JSON})",
-							contentType: "text/javascript",
-							encoding: "UTF-8"
-							)
-				} else {
-					render usuarioInstance as JSON
-				}
-			}
-		}
+        if (params.callback) {
+        	render (
+        			text: "${params.callback}(${usuarioInstance as JSON})",
+        			contentType: "text/javascript",
+        			encoding: "UTF-8"
+        			)
+        } else {
+        	render usuarioInstance as JSON
+        }
+		
+		
     }
 
     def edit() {
@@ -101,24 +80,16 @@ class UsuarioController {
             return
         }
 		
-		withFormat{
-			
-			html{
-				[usuarioInstance: usuarioInstance]
-			}
-
-			json{
-				if (params.callback) {
-					render (
-							text: "${params.callback}(${usuarioInstance as JSON})",
-							contentType: "text/javascript",
-							encoding: "UTF-8"
-							)
-				} else {
-					render usuarioInstance as JSON
-				}
-			}
-		}
+        if (params.callback) {
+        	render (
+        			text: "${params.callback}(${usuarioInstance as JSON})",
+        			contentType: "text/javascript",
+        			encoding: "UTF-8"
+        			)
+        } else {
+        	render usuarioInstance as JSON
+        }
+		
         
     }
 
@@ -142,23 +113,16 @@ class UsuarioController {
         }
 
         usuarioInstance.properties = params
-
+		
         if (!usuarioInstance.save(flush: true)) {
             render(view: "edit", model: [usuarioInstance: usuarioInstance])
             return
         }
 
 		flash.message = message(code: 'default.updated.message', args: [message(code: 'usuario.label', default: 'Usuario'), usuarioInstance.id])
-        
-		withFormat{
-			html{
-				redirect(action: "show", id: usuarioInstance.id)
-			}
-			json{
-				response.status = 200
-				render flash.message
-			}
-		}
+		
+		response.status = 200
+		render flash.message
     }
 
     def delete() {
@@ -172,28 +136,18 @@ class UsuarioController {
         try {
             usuarioInstance.delete(flush: true)
 			flash.message = message(code: 'default.deleted.message', args: [message(code: 'usuario.label', default: 'Usuario'), params.id])
+			
+			response.status = 200
+			render flash.message
             
-			withFormat{
-				html{
-					redirect(action: "list")
-				}
-				json{
-					response.status = 200
-					render flash.message
-				}
-			}
+			
         }
         catch (DataIntegrityViolationException e) {
 			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'usuario.label', default: 'Usuario'), params.id])
-            withFormat{
-				html{
-					redirect(action: "show", id: params.id)
-				}
-				json{
-					response.status = 500
-					render flash.message
-				}
-			}
+           
+			response.status = 500
+			render flash.message
+			
         }
     }
 }

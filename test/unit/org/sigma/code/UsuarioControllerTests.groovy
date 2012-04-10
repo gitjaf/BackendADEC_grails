@@ -26,11 +26,22 @@ class UsuarioControllerTests {
     }
 
     void testList() {
-
-        def model = controller.list()
 		
-        assert model.usuarioInstanceList.size() == 0
-        assert model.usuarioInstanceTotal == 0
+		populateValidParams(params)
+		def usuario = new Usuario(params)
+		assert usuario.save() != null
+		
+		response.format = "json"
+		
+		controller.list()
+		
+		assert response.json.size() == 1
+		assert response.json[0].password == 'Un password'
+		
+// 		TEST GENERADO ORIGINALMENTE.		
+//        def model = controller.list()
+//        assert model.usuarioInstanceList.size() == 0
+//        assert model.usuarioInstanceTotal == 0
     }
 
     void testCreate() {
@@ -49,8 +60,10 @@ class UsuarioControllerTests {
 
         populateValidParams(params)
         controller.save()
-
-        assert response.redirectedUrl == '/usuario/show/0'
+		
+//		  TEST GENERADO ORIGINALMENTE
+//        assert response.redirectedUrl == '/usuario/show/0'
+		assert response.status == 201
         assert controller.flash.message != null
         assert Usuario.count() == 1
     }
@@ -68,10 +81,14 @@ class UsuarioControllerTests {
         assert usuario.save() != null
 
         params.id = usuario.id
+		
+//		  TEST GENERADO ORIGINALMENTE
+//        def model = controller.show()
+//        assert model.usuarioInstance == usuario
 
-        def model = controller.show()
-
-        assert model.usuarioInstance == usuario
+		controller.show()
+		assert response.json != null
+		assert response.json.password == "Un password"
     }
 
     void testEdit() {
@@ -87,10 +104,14 @@ class UsuarioControllerTests {
         assert usuario.save() != null
 
         params.id = usuario.id
-
-        def model = controller.edit()
-
-        assert model.usuarioInstance == usuario
+		
+//		  TEST GENERADO ORIGINALMENTE
+//        def model = controller.edit()
+//        assert model.usuarioInstance == usuario
+		
+		controller.edit()
+		assert response.json != null
+		assert response.json.password == "Un password"
     }
 
     void testUpdate() {
@@ -122,7 +143,10 @@ class UsuarioControllerTests {
         populateValidParams(params)
         controller.update()
 
-        assert response.redirectedUrl == "/usuario/show/$usuario.id"
+//		  TEST GENERADO ORIGINALMENTE		
+//        assert response.redirectedUrl == "/usuario/show/$usuario.id"
+		
+		assert response.status == 200
         assert flash.message != null
 
         //test outdated version number
@@ -159,6 +183,10 @@ class UsuarioControllerTests {
 
         assert Usuario.count() == 0
         assert Usuario.get(usuario.id) == null
-        assert response.redirectedUrl == '/usuario/list'
+		assert response.status == 200
+		assert flash.message != null
+		
+//		  TEST GENERADO ORIGINALMENTE		
+//        assert response.redirectedUrl == '/usuario/list'
     }
 }
