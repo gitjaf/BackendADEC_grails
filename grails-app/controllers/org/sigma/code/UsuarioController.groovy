@@ -13,7 +13,7 @@ class UsuarioController {
 
     def list() {
 		
-    	params.max = Math.min(params.max ? params.int('max') : 20, 100)
+    	params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		
 		def usuarios = Usuario.list()
 
@@ -45,8 +45,6 @@ class UsuarioController {
 		response.status = 201
 		render flash.message
 	
-	
-	
     }
 
     def show() {
@@ -71,27 +69,6 @@ class UsuarioController {
 		
     }
 
-    def edit() {
-		
-        def usuarioInstance = Usuario.get(params.id)
-        if (!usuarioInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'usuario.label', default: 'Usuario'), params.id])
-            redirect(action: "list")
-            return
-        }
-		
-        if (params.callback) {
-        	render (
-        			text: "${params.callback}(${usuarioInstance as JSON})",
-        			contentType: "text/javascript",
-        			encoding: "UTF-8"
-        			)
-        } else {
-        	render usuarioInstance as JSON
-        }
-		
-        
-    }
 
     def update() {
         def usuarioInstance = Usuario.get(params.id)
@@ -112,8 +89,8 @@ class UsuarioController {
             }
         }
 
-        usuarioInstance.properties = params
-		
+        usuarioInstance.properties = request.JSON
+				
         if (!usuarioInstance.save(flush: true)) {
             render(view: "edit", model: [usuarioInstance: usuarioInstance])
             return

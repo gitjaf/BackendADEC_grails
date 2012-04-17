@@ -13,6 +13,7 @@ class Usuario {
 	String telefono
 	String email
 	
+	
     static constraints = {
 		nombre(required: true)
 		apellido(required: true)

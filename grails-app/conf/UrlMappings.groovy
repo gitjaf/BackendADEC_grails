@@ -15,12 +15,17 @@ class UrlMappings {
 		"/usuarios/${id}"{
 			controller = 'usuario'
 			action = [GET: "show", DELETE: "delete", PUT: "update"]
+		}
+		
+		"/perfiles"{
+			controller = 'perfil'
+			action =[GET: "list", POST: "save"]
 			
 		}
 		
-		"/usuarios/edit/${id}"{
-			controller = 'usuario'
-			action = [GET: "edit"]
+		"/perfiles/${id}"{
+			controller = 'perfil'
+			action = [GET: "show", DELETE: "delete", PUT: "update"]
 		}
 		
 		"/login"{

@@ -12,7 +12,9 @@ class BootStrap {
 		
 		if (!isProd){
 			fixtureLoader.load('usuarioFixtures')    // Ommit the .groovy extension!
+			fixtureLoader.load('perfilFixtures')
 			assert Usuario.count == 5
+			assert Perfil.count == 4
 		}
 		
 	}
