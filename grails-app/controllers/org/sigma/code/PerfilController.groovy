@@ -18,7 +18,7 @@ class PerfilController {
 		
 		if(params.callback){
 			render (
-				text: "${params.callback}(${usuarios as JSON})",
+				text: "${params.callback}(${perfiles as JSON})",
 				contentType: "text/javascript",
 				encoding: "UTF-8"
 				)
@@ -33,9 +33,10 @@ class PerfilController {
     }
 
     def save() {
-        def perfilInstance = new Perfil(params)
+        def perfilInstance = new Perfil(request.JSON)
         if (!perfilInstance.save(flush: true)) {
-            render(view: "create", model: [perfilInstance: perfilInstance])
+//            render(view: "create", model: [perfilInstance: perfilInstance])
+			response.status = 500
             return
         }
 
@@ -79,25 +80,15 @@ class PerfilController {
                 perfilInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
                           [message(code: 'perfil.label', default: 'Perfil')] as Object[],
                           "Another user has updated this Perfil while you were editing")
-                render(view: "edit", model: [perfilInstance: perfilInstance])
+                render(view: "show", model: [perfilInstance: perfilInstance])
                 return
             }
         }
-
-		/* FIXME
-		 * Para que esto funcione con el metodo PUT, hay que enviar un JSON
-		 * y reemplazar la siguiente linea por
-		 * 
-		 * perfilInstance.properties = request.JSON
-		 * 
-		 * de lo contrario hay que usar como unicos metodos GET y POST
-		 *  
-		 */
-		
-        perfilInstance.properties = params
+				
+        perfilInstance.properties = request.JSON
 
         if (!perfilInstance.save(flush: true)) {
-            render(view: "edit", model: [perfilInstance: perfilInstance])
+            render(view: "show", model: [perfilInstance: perfilInstance])
             return
         }
 

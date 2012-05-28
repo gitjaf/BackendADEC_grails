@@ -15,10 +15,10 @@ class Usuario {
 	
 	
     static constraints = {
-		nombre(required: true)
-		apellido(required: true)
-		username(required: true)
-		password(required: true)
+		nombre(required: true, blank: false)
+		apellido(required: true, blank: false)
+		username(required: true, blank: false)
+		password(required: true, blank: false)
 		email(required: true)
 		localidad(nullable: true)
 		direccion(nullable: true)

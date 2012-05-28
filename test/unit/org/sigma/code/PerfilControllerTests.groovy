@@ -2,8 +2,10 @@ package org.sigma.code
 
 
 
+import org.apache.jasper.compiler.Node.ParamsAction;
 import org.junit.*
 import grails.test.mixin.*
+import grails.converters.JSON
 
 @TestFor(PerfilController)
 @Mock(Perfil)
@@ -11,9 +13,10 @@ class PerfilControllerTests {
 
 
     def populateValidParams(params) {
-      assert params != null
-      // TODO: Populate valid properties like...
-      //params["name"] = 'someValidName'
+		params["perfil"] = "ADEC"
+		params["seccion"] = "Seccion 1"
+		assert params != null
+      
     }
 
     void testIndex() {
@@ -22,11 +25,16 @@ class PerfilControllerTests {
     }
 
     void testList() {
+		populateValidParams(params)
+		def perfil = new Perfil(params)
+		assert perfil.save() != null
+		
+		response.format = "json"
+		
+        controller.list()
 
-        def model = controller.list()
-
-        assert model.perfilInstanceList.size() == 0
-        assert model.perfilInstanceTotal == 0
+        assert response.json.size() == 1
+        assert response.json[0].perfil == "ADEC"
     }
 
     void testCreate() {
@@ -38,15 +46,15 @@ class PerfilControllerTests {
     void testSave() {
         controller.save()
 
-        assert model.perfilInstance != null
-        assert view == '/perfil/create'
+        assert response.status == 500
 
         response.reset()
 
         populateValidParams(params)
+		request.setJson(params as JSON)
         controller.save()
 
-        assert response.redirectedUrl == '/perfil/show/1'
+        assert response.status == 201
         assert controller.flash.message != null
         assert Perfil.count() == 1
     }
@@ -65,28 +73,10 @@ class PerfilControllerTests {
 
         params.id = perfil.id
 
-        def model = controller.show()
+        controller.show()
 
-        assert model.perfilInstance == perfil
-    }
-
-    void testEdit() {
-        controller.edit()
-
-        assert flash.message != null
-        assert response.redirectedUrl == '/perfil/list'
-
-
-        populateValidParams(params)
-        def perfil = new Perfil(params)
-
-        assert perfil.save() != null
-
-        params.id = perfil.id
-
-        def model = controller.edit()
-
-        assert model.perfilInstance == perfil
+        assert response.json != null
+		assert response.json.perfil == "ADEC"
     }
 
     void testUpdate() {
@@ -97,27 +87,31 @@ class PerfilControllerTests {
 
         response.reset()
 
-
         populateValidParams(params)
         def perfil = new Perfil(params)
-
+		perfil.version = 1
         assert perfil.save() != null
 
         // test invalid parameters in update
         params.id = perfil.id
-        //TODO: add invalid values to params object
-
+		params.perfil = ""
+		request.setJson(params as JSON)
+		
         controller.update()
 
-        assert view == "/perfil/edit"
+        assert view == "/perfil/show"
         assert model.perfilInstance != null
 
         perfil.clearErrors()
+		response.reset()
 
         populateValidParams(params)
+		params.id = perfil.id
+		request.setJson(params as JSON)
+		
         controller.update()
 
-        assert response.redirectedUrl == "/perfil/show/$perfil.id"
+        assert response.status == 200
         assert flash.message != null
 
         //test outdated version number
@@ -127,9 +121,10 @@ class PerfilControllerTests {
         populateValidParams(params)
         params.id = perfil.id
         params.version = -1
+		request.setJson(params as JSON)
         controller.update()
 
-        assert view == "/perfil/edit"
+        assert view == "/perfil/show"
         assert model.perfilInstance != null
         assert model.perfilInstance.errors.getFieldError('version')
         assert flash.message != null
@@ -154,6 +149,8 @@ class PerfilControllerTests {
 
         assert Perfil.count() == 0
         assert Perfil.get(perfil.id) == null
-        assert response.redirectedUrl == '/perfil/list'
+        assert response.status == 200
+		assert flash.message != null
+		
     }
 }

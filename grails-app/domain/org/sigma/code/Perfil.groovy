@@ -7,7 +7,7 @@ class Perfil {
 	String perfil
 	
     static constraints = {
-    	seccion(required: true)
-		perfil(required: true)
+    	seccion(required: true, blank: false)
+		perfil(required: true, blank: false)
 	}
 }

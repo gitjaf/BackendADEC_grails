@@ -34,9 +34,10 @@ class UsuarioController {
     }
 
     def save() {
-        def usuarioInstance = new Usuario(params)
+        def usuarioInstance = new Usuario(request.JSON)
         if (!usuarioInstance.save(flush: true)) {
-            render(view: "create", model: [usuarioInstance: usuarioInstance])
+//			render(view: "create", model: [usuarioInstance: usuarioInstance])
+			response.status = 500
             return
         }
 
@@ -77,22 +78,22 @@ class UsuarioController {
             redirect(action: "list")
             return
         }
-
+				
         if (params.version) {
             def version = params.version.toLong()
             if (usuarioInstance.version > version) {
                 usuarioInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
                           [message(code: 'usuario.label', default: 'Usuario')] as Object[],
                           "Another user has updated this Usuario while you were editing")
-                render(view: "edit", model: [usuarioInstance: usuarioInstance])
+                render(view: "show", model: [usuarioInstance: usuarioInstance])
                 return
             }
         }
-
+		
         usuarioInstance.properties = request.JSON
 				
         if (!usuarioInstance.save(flush: true)) {
-            render(view: "edit", model: [usuarioInstance: usuarioInstance])
+            render(view: "show", model: [usuarioInstance: usuarioInstance])
             return
         }
 

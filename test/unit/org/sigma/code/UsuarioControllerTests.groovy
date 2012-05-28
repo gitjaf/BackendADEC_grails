@@ -3,20 +3,23 @@ package org.sigma.code
 
 
 import org.junit.*
+import org.springframework.mock.web.MockHttpServletRequest;
+
 import grails.test.mixin.*
+import grails.converters.JSON
 
 @TestFor(UsuarioController)
 @Mock(Usuario)
 class UsuarioControllerTests {
 	
     def populateValidParams(params) {
-	  // TODO: Populate valid properties like...
-	  //params["name"] = 'someValidName'
+	  params.clear()
 	  params["nombre"] = "Un Nombre"
 	  params["apellido"] = "Un Apellido"
 	  params["username"] = "Un username"
 	  params["password"] = "Un password"
 	  params["email"] = "unemail@valido.com"
+	  
 	  assert params != null
     }
 
@@ -53,12 +56,12 @@ class UsuarioControllerTests {
     void testSave() {
         controller.save()
 
-        assert model.usuarioInstance != null
-        assert view == '/usuario/create'
+        assert response.status == 500
 
         response.reset()
 
         populateValidParams(params)
+		request.setJson(params as JSON)
         controller.save()
 		
 //		  TEST GENERADO ORIGINALMENTE
@@ -73,7 +76,6 @@ class UsuarioControllerTests {
 
         assert flash.message != null
         assert response.redirectedUrl == '/usuario/list'
-
 
         populateValidParams(params)
         def usuario = new Usuario(params)
@@ -91,56 +93,37 @@ class UsuarioControllerTests {
 		assert response.json.password == "Un password"
     }
 
-    void testEdit() {
-        controller.edit()
-
-        assert flash.message != null
-        assert response.redirectedUrl == '/usuario/list'
-
-
-        populateValidParams(params)
-        def usuario = new Usuario(params)
-
-        assert usuario.save() != null
-
-        params.id = usuario.id
-		
-//		  TEST GENERADO ORIGINALMENTE
-//        def model = controller.edit()
-//        assert model.usuarioInstance == usuario
-		
-		controller.edit()
-		assert response.json != null
-		assert response.json.password == "Un password"
-    }
-
+    
     void testUpdate() {
         controller.update()
 
         assert flash.message != null
         assert response.redirectedUrl == '/usuario/list'
-
-        response.reset()
-
-
+		
+		response.reset()
+		
         populateValidParams(params)
         def usuario = new Usuario(params)
-
+		usuario.version = 1
         assert usuario.save() != null
 
         // test invalid parameters in update
         params.id = usuario.id
-		params.nombre = null
-        
-
+		params.nombre = ""
+        request.setJson(params as JSON)
+		
         controller.update()
 
-        assert view == "/usuario/edit"
+        assert view == "/usuario/show"
         assert model.usuarioInstance != null
 
         usuario.clearErrors()
-
+		response.reset()
+		
         populateValidParams(params)
+		params.id = usuario.id
+		request.setJson(params as JSON)
+		
         controller.update()
 
 //		  TEST GENERADO ORIGINALMENTE		
@@ -153,12 +136,13 @@ class UsuarioControllerTests {
         response.reset()
         usuario.clearErrors()
 
-        populateValidParams(params)
-        params.id = usuario.id
+		populateValidParams(params);
+		params.id = usuario.id
         params.version = -1
+		request.setJson(params as JSON)
         controller.update()
 
-        assert view == "/usuario/edit"
+        assert view == "/usuario/show"
         assert model.usuarioInstance != null
         assert model.usuarioInstance.errors.getFieldError('version')
         assert flash.message != null
