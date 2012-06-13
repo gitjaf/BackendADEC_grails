@@ -13,6 +13,8 @@ class Usuario {
 	String telefono
 	String email
 	
+	Perfil perfil
+	
 	
     static constraints = {
 		nombre(required: true, blank: false)

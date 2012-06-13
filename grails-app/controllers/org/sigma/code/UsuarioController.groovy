@@ -17,6 +17,8 @@ class UsuarioController {
 		
 		def usuarios = Usuario.list()
 
+		response.status = 200
+		
 		if (params.callback) {
 			render (
 					text: "${params.callback}(${usuarios as JSON})",
@@ -29,22 +31,19 @@ class UsuarioController {
 		
     }
 
-    def create() {
-		[usuarioInstance: new Usuario(params)]
-    }
-
     def save() {
         def usuarioInstance = new Usuario(request.JSON)
-        if (!usuarioInstance.save(flush: true)) {
-//			render(view: "create", model: [usuarioInstance: usuarioInstance])
+		def perfil = Perfil.get(request.JSON.idPerfil)
+		usuarioInstance.perfil = perfil
+        
+		if (!usuarioInstance.save(flush: true)) {
 			response.status = 500
             return
         }
 
 		flash.message = message(code: 'default.created.message', args: [message(code: 'usuario.label', default: 'Usuario'), usuarioInstance.id])
-        
 		response.status = 201
-		render flash.message
+		render usuarioInstance as JSON
 	
     }
 
@@ -53,9 +52,12 @@ class UsuarioController {
         
 		if (!usuarioInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [message(code: 'usuario.label', default: 'Usuario'), params.id])
-            redirect(action: "list")
+            response.status = 404
+			render flash.message
             return
         }
+		
+		response.status = 200
 		
         if (params.callback) {
         	render (
@@ -75,17 +77,17 @@ class UsuarioController {
         def usuarioInstance = Usuario.get(params.id)
         if (!usuarioInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'usuario.label', default: 'Usuario'), params.id])
-            redirect(action: "list")
+            response.status = 404
+			render flash.message
             return
         }
 				
-        if (params.version) {
-            def version = params.version.toLong()
+        if (request.JSON.version) {
+            def version = request.JSON.version.toLong()
             if (usuarioInstance.version > version) {
-                usuarioInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                          [message(code: 'usuario.label', default: 'Usuario')] as Object[],
-                          "Another user has updated this Usuario while you were editing")
-                render(view: "show", model: [usuarioInstance: usuarioInstance])
+                flash.message = message(code: 'default.optimistic.locking.failure', args: [message(code: 'usuario.label', default: 'Usuario'), params.id])
+				response.status = 409
+				render flash.message
                 return
             }
         }
@@ -93,21 +95,23 @@ class UsuarioController {
         usuarioInstance.properties = request.JSON
 				
         if (!usuarioInstance.save(flush: true)) {
-            render(view: "show", model: [usuarioInstance: usuarioInstance])
+            response.status = 500
+			render usuarioInstance as JSON
             return
         }
 
 		flash.message = message(code: 'default.updated.message', args: [message(code: 'usuario.label', default: 'Usuario'), usuarioInstance.id])
 		
 		response.status = 200
-		render flash.message
+		render usuarioInstance as JSON
     }
 
     def delete() {
         def usuarioInstance = Usuario.get(params.id)
         if (!usuarioInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [message(code: 'usuario.label', default: 'Usuario'), params.id])
-            redirect(action: "list")
+            response.status = 404
+			render flash.message
             return
         }
 

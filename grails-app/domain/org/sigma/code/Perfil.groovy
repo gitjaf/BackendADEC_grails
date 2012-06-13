@@ -3,11 +3,13 @@ package org.sigma.code
 class Perfil {
 
 	int id
-	String seccion
-	String perfil
+	String descripcion
+	
+	static belongsTo = Usuario
+	
+	static hasMany = [menues: Menu, secciones: Seccion, sidebars: Novedad_Sidebar, novedades: Novedad]
 	
     static constraints = {
-    	seccion(required: true, blank: false)
-		perfil(required: true, blank: false)
+		descripcion(required: false, nullable: true)
 	}
 }

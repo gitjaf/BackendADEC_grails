@@ -14,7 +14,9 @@ class PerfilController {
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         
-		def perfiles = Perfil.list();
+		def perfiles = Perfil.list()
+		
+		reponse.status = 200
 		
 		if(params.callback){
 			render (
@@ -35,7 +37,6 @@ class PerfilController {
     def save() {
         def perfilInstance = new Perfil(request.JSON)
         if (!perfilInstance.save(flush: true)) {
-//            render(view: "create", model: [perfilInstance: perfilInstance])
 			response.status = 500
             return
         }
@@ -49,10 +50,13 @@ class PerfilController {
         def perfilInstance = Perfil.get(params.id)
         if (!perfilInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [message(code: 'perfil.label', default: 'Perfil'), params.id])
-            redirect(action: "list")
+            response.status = 404
+			render flash.message
             return
         }
 
+		response.status = 200
+		
 		if (params.callback) {
         	render (
         			text: "${params.callback}(${perfilInstance as JSON})",
@@ -70,7 +74,8 @@ class PerfilController {
         def perfilInstance = Perfil.get(params.id)
         if (!perfilInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'perfil.label', default: 'Perfil'), params.id])
-            redirect(action: "list")
+            response.status = 404
+			render flash.message
             return
         }
 
@@ -80,7 +85,8 @@ class PerfilController {
                 perfilInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
                           [message(code: 'perfil.label', default: 'Perfil')] as Object[],
                           "Another user has updated this Perfil while you were editing")
-                render(view: "show", model: [perfilInstance: perfilInstance])
+                response.status = 409
+				render flash.message
                 return
             }
         }
@@ -88,21 +94,23 @@ class PerfilController {
         perfilInstance.properties = request.JSON
 
         if (!perfilInstance.save(flush: true)) {
-            render(view: "show", model: [perfilInstance: perfilInstance])
+            response.status = 500
+			render perfilInstance as JSON
             return
         }
 
 		flash.message = message(code: 'default.updated.message', args: [message(code: 'perfil.label', default: 'Perfil'), perfilInstance.id])
         response.status = 200
-		render flash.message
+		render perfilInstance as JSON
     }
 
     def delete() {
         def perfilInstance = Perfil.get(params.id)
         if (!perfilInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [message(code: 'perfil.label', default: 'Perfil'), params.id])
-            redirect(action: "list")
-            return
+			response.status = 404
+			render flash.message 
+			return
         }
 
         try {

@@ -7,18 +7,21 @@ import org.springframework.mock.web.MockHttpServletRequest;
 
 import grails.test.mixin.*
 import grails.converters.JSON
+import groovy.mock.interceptor.MockFor;
 
 @TestFor(UsuarioController)
-@Mock(Usuario)
+@Mock([Usuario, Perfil])
 class UsuarioControllerTests {
 	
-    def populateValidParams(params) {
+    def populateValidParams(Map params) {
 	  params.clear()
 	  params["nombre"] = "Un Nombre"
 	  params["apellido"] = "Un Apellido"
 	  params["username"] = "Un username"
 	  params["password"] = "Un password"
 	  params["email"] = "unemail@valido.com"
+	  def perfil = new Perfil(id: 1, descripcion: 'ADEC')
+	  params["perfil"] = perfil
 	  
 	  assert params != null
     }
@@ -29,129 +32,127 @@ class UsuarioControllerTests {
     }
 
     void testList() {
-		
+		request.setMethod("GET")
+		// Prueba listado de todos los usuarios 
 		populateValidParams(params)
 		def usuario = new Usuario(params)
 		assert usuario.save() != null
+		println usuario.properties
 		
 		response.format = "json"
-		
 		controller.list()
 		
+		assert response.status == 200
 		assert response.json.size() == 1
-		assert response.json[0].password == 'Un password'
+		assert response.json[0].password != null
 		
-// 		TEST GENERADO ORIGINALMENTE.		
-//        def model = controller.list()
-//        assert model.usuarioInstanceList.size() == 0
-//        assert model.usuarioInstanceTotal == 0
     }
 
-    void testCreate() {
-       def model = controller.create()
-
-       assert model.usuarioInstance != null
-    }
 
     void testSave() {
+		request.setMethod("POST")
+		//Prueba guardar un usuario no valido
         controller.save()
-
         assert response.status == 500
-
         response.reset()
 
+		//Prueba guardar usuario valido
         populateValidParams(params)
+		mockDomain(Perfil, [params.perfil])
+		params.idPerfil = params.perfil.id
 		request.setJson(params as JSON)
-        controller.save()
+        response.format = "json"
+		controller.save()
 		
-//		  TEST GENERADO ORIGINALMENTE
-//        assert response.redirectedUrl == '/usuario/show/0'
 		assert response.status == 201
-        assert controller.flash.message != null
         assert Usuario.count() == 1
+		assert response.json.nombre == "Un Nombre"
+		
     }
 
     void testShow() {
-        controller.show()
+		request.setMethod("GET")
+        // Prueba mostrar un objeto no existente
+		controller.show()
 
+        assert response.status == 404
         assert flash.message != null
-        assert response.redirectedUrl == '/usuario/list'
 
+		response.reset()
+		
+		// Prueba mostrar un objeto existente
         populateValidParams(params)
         def usuario = new Usuario(params)
-
         assert usuario.save() != null
 
-        params.id = usuario.id
+		response.format = "json"
 		
-//		  TEST GENERADO ORIGINALMENTE
-//        def model = controller.show()
-//        assert model.usuarioInstance == usuario
+        params.id = usuario.id
 
 		controller.show()
+		
+		assert response.status == 200
 		assert response.json != null
 		assert response.json.password == "Un password"
     }
 
     
-    void testUpdate() {
-        controller.update()
-
-        assert flash.message != null
-        assert response.redirectedUrl == '/usuario/list'
+    void testUpdateInexistente() {
+    	//Prueba actualizar un recurso inexistente
+		request.setMethod("PUT")
 		
-		response.reset()
+		controller.update()
 		
-        populateValidParams(params)
-        def usuario = new Usuario(params)
-		usuario.version = 1
-        assert usuario.save() != null
+		assert response.status == 404
+		assert flash.message != null
 
-        // test invalid parameters in update
-        params.id = usuario.id
+    }
+	
+	void testUpdateConcurrente(){
+		// Prueba actualizar un objeto cuya version implica modificacion concurrente
+		request.setMethod("PUT")
+			
+		populateValidParams(params)
+		def usuario = new Usuario(params)
+		assert usuario.save(flush: true) != null
+		
+		params.version = 1
+		usuario.version = 2
+		
+		params.id = usuario.id
+		mockDomain(Usuario, [usuario])
+		
+		request.setJson(params as JSON)
+		
+		controller.update()
+		assert response.status == 409
+		assert flash.message != null
+	}	
+	
+	void testUpdateInvalido(){
+		// Prueba guardar un objeto con parametros no validos
+		request.setMethod("PUT")
+		populateValidParams(params)
+
+		def usuario = new Usuario(params)
+		assert usuario.save() != null
+				
+		params.id = usuario.id
 		params.nombre = ""
-        request.setJson(params as JSON)
 		
-        controller.update()
-
-        assert view == "/usuario/show"
-        assert model.usuarioInstance != null
-
-        usuario.clearErrors()
-		response.reset()
-		
-        populateValidParams(params)
-		params.id = usuario.id
 		request.setJson(params as JSON)
 		
-        controller.update()
-
-//		  TEST GENERADO ORIGINALMENTE		
-//        assert response.redirectedUrl == "/usuario/show/$usuario.id"
+		controller.update()
 		
-		assert response.status == 200
-        assert flash.message != null
-
-        //test outdated version number
-        response.reset()
-        usuario.clearErrors()
-
-		populateValidParams(params);
-		params.id = usuario.id
-        params.version = -1
-		request.setJson(params as JSON)
-        controller.update()
-
-        assert view == "/usuario/show"
-        assert model.usuarioInstance != null
-        assert model.usuarioInstance.errors.getFieldError('version')
-        assert flash.message != null
+		assert response.status == 500
+		assert response.json.nombre == ""
+		
     }
 
     void testDelete() {
         controller.delete()
-        assert flash.message != null
-        assert response.redirectedUrl == '/usuario/list'
+		assert response.status == 404
+		assert flash.message != null
 
         response.reset()
 
@@ -170,7 +171,5 @@ class UsuarioControllerTests {
 		assert response.status == 200
 		assert flash.message != null
 		
-//		  TEST GENERADO ORIGINALMENTE		
-//        assert response.redirectedUrl == '/usuario/list'
     }
 }
