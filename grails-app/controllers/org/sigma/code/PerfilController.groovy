@@ -16,22 +16,10 @@ class PerfilController {
         
 		def perfiles = Perfil.list()
 		
-		reponse.status = 200
-		
-		if(params.callback){
-			render (
-				text: "${params.callback}(${perfiles as JSON})",
-				contentType: "text/javascript",
-				encoding: "UTF-8"
-				)
-		} else {
-			render perfiles as JSON
-		}
-		
-    }
+		response.status = 200
 
-    def create() {
-        [perfilInstance: new Perfil(params)]
+		render perfiles as JSON
+	
     }
 
     def save() {
@@ -42,8 +30,8 @@ class PerfilController {
         }
 
 		flash.message = message(code: 'default.created.message', args: [message(code: 'perfil.label', default: 'Perfil'), perfilInstance.id])
-        response.setStatus(201)
-		render flash.message
+        response.status = 201
+		render perfilInstance as JSON
     }
 
     def show() {
@@ -56,16 +44,8 @@ class PerfilController {
         }
 
 		response.status = 200
-		
-		if (params.callback) {
-        	render (
-        			text: "${params.callback}(${perfilInstance as JSON})",
-        			contentType: "text/javascript",
-        			encoding: "UTF-8"
-        			)
-        } else {
-        	render perfilInstance as JSON
-        }
+
+		render perfilInstance as JSON
     }
 
     
@@ -79,12 +59,10 @@ class PerfilController {
             return
         }
 
-        if (params.version) {
-            def version = params.version.toLong()
+        if (request.JSON.version) {
+            def version = request.JSON.version.toLong()
             if (perfilInstance.version > version) {
-                perfilInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                          [message(code: 'perfil.label', default: 'Perfil')] as Object[],
-                          "Another user has updated this Perfil while you were editing")
+                flash.message = message(code: 'default.optimistic.locking.failure', args: [message(code: 'perfil.label', default: 'Perfil'), params.id])
                 response.status = 409
 				render flash.message
                 return

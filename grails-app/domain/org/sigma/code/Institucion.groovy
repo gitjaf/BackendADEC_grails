@@ -6,7 +6,7 @@ class Institucion {
 	String domicilio
 	
     static constraints = {
-    	nombre(nullable: true)
+    	nombre(required: true, nullable: false, blank: false)
 		domicilio(nullable: true)
 	}
 	

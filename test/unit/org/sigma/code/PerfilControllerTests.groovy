@@ -13,8 +13,7 @@ class PerfilControllerTests {
 
 
     def populateValidParams(params) {
-		params["perfil"] = "ADEC"
-		params["seccion"] = "Seccion 1"
+		params["descripcion"] = "ADEC"
 		assert params != null
       
     }
@@ -25,6 +24,7 @@ class PerfilControllerTests {
     }
 
     void testList() {
+		request.method = "GET"
 		populateValidParams(params)
 		def perfil = new Perfil(params)
 		assert perfil.save() != null
@@ -32,24 +32,21 @@ class PerfilControllerTests {
 		response.format = "json"
 		
         controller.list()
-
+		
+		assert response.status == 200
         assert response.json.size() == 1
-        assert response.json[0].perfil == "ADEC"
-    }
-
-    void testCreate() {
-       def model = controller.create()
-
-       assert model.perfilInstance != null
+        assert response.json[0].descripcion == "ADEC"
     }
 
     void testSave() {
+		request.method = "POST"
         controller.save()
 
         assert response.status == 500
 
         response.reset()
-
+		response.format = "json"
+		
         populateValidParams(params)
 		request.setJson(params as JSON)
         controller.save()
@@ -57,94 +54,126 @@ class PerfilControllerTests {
         assert response.status == 201
         assert controller.flash.message != null
         assert Perfil.count() == 1
+		assert response.json.descripcion == "ADEC"
     }
 
     void testShow() {
+		request.method = "GET"
         controller.show()
 
+        assert response.status == 404
         assert flash.message != null
-        assert response.redirectedUrl == '/perfil/list'
 
-
+		response.reset()
+		response.format = "json"
+		
         populateValidParams(params)
         def perfil = new Perfil(params)
-
         assert perfil.save() != null
-
+		
         params.id = perfil.id
 
+		mockDomain(Perfil, [perfil])
         controller.show()
 
+		assert response.status == 200
         assert response.json != null
-		assert response.json.perfil == "ADEC"
+		assert response.json.descripcion == "ADEC"
     }
 
-    void testUpdate() {
+    void testUpdateInexistente() {
+		request.method = "PUT"
+		
         controller.update()
 
+        assert response.status == 404
         assert flash.message != null
-        assert response.redirectedUrl == '/perfil/list'
 
-        response.reset()
+    }
 
+	void testUpdateInvalido(){
+		request.method = "PUT"
+		
         populateValidParams(params)
         def perfil = new Perfil(params)
-		perfil.version = 1
         assert perfil.save() != null
 
         // test invalid parameters in update
         params.id = perfil.id
-		params.perfil = ""
+		params.descripcion = ""
 		request.setJson(params as JSON)
+		
+		mockDomain(Perfil, [perfil])
 		
         controller.update()
 
-        assert view == "/perfil/show"
-        assert model.perfilInstance != null
+        assert response.status == 500
+		assert response.json != null
+        assert response.json.descripcion == ""
 
-        perfil.clearErrors()
-		response.reset()
-
+	}
+	
+	void testUpdateValido(){
+		request.method = "PUT"
+		response.format = "json"
+		
         populateValidParams(params)
+		def perfil = new Perfil(params)
+		assert perfil.save() != null
+		
 		params.id = perfil.id
+		params.descripcion = "ADEC2"
 		request.setJson(params as JSON)
+		
+		mockDomain(Perfil, [perfil])
 		
         controller.update()
 
         assert response.status == 200
-        assert flash.message != null
-
-        //test outdated version number
-        response.reset()
-        perfil.clearErrors()
-
+        assert response.json != null
+		assert response.json.descripcion == "ADEC2"
+		
+	}
+	
+	void testUpdateConcurrente(){
+		//test outdated version number
+		request.method = "PUT"
+		response.format = "json"
+		
         populateValidParams(params)
+		def perfil = new Perfil(params)
+		perfil.version = 1
+		assert perfil.save() != null
+		
         params.id = perfil.id
         params.version = -1
 		request.setJson(params as JSON)
+		
+		mockDomain(Perfil, [perfil])
+		
         controller.update()
 
-        assert view == "/perfil/show"
-        assert model.perfilInstance != null
-        assert model.perfilInstance.errors.getFieldError('version')
-        assert flash.message != null
+		assert response.status == 409
+		assert flash.message != null
     }
 
     void testDelete() {
+		request.method = "DELETE"
         controller.delete()
+        assert response.status == 404
         assert flash.message != null
-        assert response.redirectedUrl == '/perfil/list'
 
         response.reset()
 
         populateValidParams(params)
         def perfil = new Perfil(params)
-
         assert perfil.save() != null
         assert Perfil.count() == 1
 
         params.id = perfil.id
 
+		mockDomain(Perfil, [perfil])
+		
         controller.delete()
 
         assert Perfil.count() == 0

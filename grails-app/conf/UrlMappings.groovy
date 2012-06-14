@@ -1,32 +1,15 @@
 class UrlMappings {
 
 	static mappings = {
-//		"/$controller/$action?/$id?"{
-//			constraints {
-//				// apply constraints here
-//			}
-//		}
 		
-		"/usuarios"{
-			controller = 'usuario'
+		"/$controller"{
 			action = [GET: "list", POST: "save"]
 		}
 		
-		"/usuarios/${id}"{
-			controller = 'usuario'
+		"/$controller/$id"{
 			action = [GET: "show", DELETE: "delete", PUT: "update"]
 		}
 		
-		"/perfiles"{
-			controller = 'perfil'
-			action =[GET: "list", POST: "save"]
-			
-		}
-		
-		"/perfiles/${id}"{
-			controller = 'perfil'
-			action = [GET: "show", DELETE: "delete", PUT: "update"]
-		}
 		
 		"/login"{
 			controller = 'static'

@@ -34,7 +34,7 @@ class InstitucionController {
 
 		flash.message = message(code: 'default.created.message', args: [message(code: 'institucion.label', default: 'Institucion'), institucionInstance.id])
 		response.status = 201
-		render flash.message
+		render institucionInstance as JSON
 		
 	}
 
@@ -46,7 +46,7 @@ class InstitucionController {
 			render flash.message
             return
         }
-		
+		response.status == 200
 		render institucionInstance as JSON
     }
    
@@ -63,9 +63,7 @@ class InstitucionController {
         if (request.JSON.version) {
             def version = request.JSON.version.toLong()
             if (institucionInstance.version > version) {
-                institucionInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                          [message(code: 'institucion.label', default: 'Institucion')] as Object[],
-                          "Another user has updated this Institucion while you were editing")
+				flash.message = message(code: 'default.optimistic.locking.failure', args: [message(code: 'institucion.label', default: 'Institucion'), institucionInstance.id])
                 response.status = 409
                 return
             }

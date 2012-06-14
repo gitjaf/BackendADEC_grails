@@ -37,7 +37,6 @@ class UsuarioControllerTests {
 		populateValidParams(params)
 		def usuario = new Usuario(params)
 		assert usuario.save() != null
-		println usuario.properties
 		
 		response.format = "json"
 		controller.list()
@@ -150,6 +149,7 @@ class UsuarioControllerTests {
     }
 
     void testDelete() {
+		request.method = "DELETE"
         controller.delete()
 		assert response.status == 404
 		assert flash.message != null
