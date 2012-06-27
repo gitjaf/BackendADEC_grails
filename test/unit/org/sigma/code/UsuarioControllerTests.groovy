@@ -54,7 +54,7 @@ class UsuarioControllerTests {
         controller.save()
         assert response.status == 500
         response.reset()
-
+		
 		//Prueba guardar usuario valido
         populateValidParams(params)
 		mockDomain(Perfil, [params.perfil])

@@ -8,9 +8,9 @@ class Menu {
 	String controller
 	
     static constraints = {
-		evento(nullable: true)
-		img(nullable: true)
-		nombre(nullable: true)
-		controller(nullable: true)
+		evento(nullable: false, blank: false)
+		img(nullable: false, blank: false)
+		nombre(nullable: false, blank: false)
+		controller(nullable: false, blank: false)
     }
 }

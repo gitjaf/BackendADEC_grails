@@ -1,7 +1,5 @@
 package org.sigma.code
 
-
-
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON

@@ -1,10 +1,12 @@
+
 package org.sigma.code
 
 import org.springframework.dao.DataIntegrityViolationException
+import grails.converters.JSON
 
 class HistorialController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [show: ["GET", "POST"], save: "POST", update: "PUT", delete: "DELETE"]
 
     def index() {
         redirect(action: "list", params: params)
@@ -12,92 +14,88 @@ class HistorialController {
 
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [historialInstanceList: Historial.list(params), historialInstanceTotal: Historial.count()]
+		
+		def historialInstanceList = Historial.list()
+		
+		response.status = 200
+		
+		render historialInstanceList as JSON
     }
-
-    def create() {
-        [historialInstance: new Historial(params)]
-    }
-
+    
     def save() {
-        def historialInstance = new Historial(params)
+        def historialInstance = new Historial(request.JSON)
         if (!historialInstance.save(flush: true)) {
-            render(view: "create", model: [historialInstance: historialInstance])
-            return
+			response.status = 500
+			return
         }
 
 		flash.message = message(code: 'default.created.message', args: [message(code: 'historial.label', default: 'Historial'), historialInstance.id])
-        redirect(action: "show", id: historialInstance.id)
+        response.status = 201
+		render historialInstance as JSON
     }
 
     def show() {
         def historialInstance = Historial.get(params.id)
         if (!historialInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [message(code: 'historial.label', default: 'Historial'), params.id])
-            redirect(action: "list")
+            response.status = 404
+			render flash.message
             return
         }
-
-        [historialInstance: historialInstance]
-    }
-
-    def edit() {
-        def historialInstance = Historial.get(params.id)
-        if (!historialInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'historial.label', default: 'Historial'), params.id])
-            redirect(action: "list")
-            return
-        }
-
-        [historialInstance: historialInstance]
+		response.status = 200
+        render historialInstance as JSON
     }
 
     def update() {
         def historialInstance = Historial.get(params.id)
         if (!historialInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'historial.label', default: 'Historial'), params.id])
-            redirect(action: "list")
+            response.status = 404
+			render flash.message
             return
         }
 
-        if (params.version) {
-            def version = params.version.toLong()
+        if (request.JSON.version) {
+            def version = request.JSON.version.toLong()
             if (historialInstance.version > version) {
-                historialInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                          [message(code: 'historial.label', default: 'Historial')] as Object[],
-                          "Another user has updated this Historial while you were editing")
-                render(view: "edit", model: [historialInstance: historialInstance])
+				flash.message = message(code: 'default.optimistic.locking.failure', args: [message(code: 'historial.label', default: 'Historial'), historialInstance.id])
+                response.status = 409
                 return
             }
         }
 
-        historialInstance.properties = params
+        historialInstance.properties = request.JSON
 
         if (!historialInstance.save(flush: true)) {
-            render(view: "edit", model: [historialInstance: historialInstance])
+            response.status = 500
+			render historialInstance as JSON
             return
         }
 
 		flash.message = message(code: 'default.updated.message', args: [message(code: 'historial.label', default: 'Historial'), historialInstance.id])
-        redirect(action: "show", id: historialInstance.id)
+		response.status = 200
+        render historialInstance as JSON
     }
 
     def delete() {
         def historialInstance = Historial.get(params.id)
         if (!historialInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [message(code: 'historial.label', default: 'Historial'), params.id])
-            redirect(action: "list")
+            response.status = 404
+			render flash.message
             return
         }
 
         try {
             historialInstance.delete(flush: true)
 			flash.message = message(code: 'default.deleted.message', args: [message(code: 'historial.label', default: 'Historial'), params.id])
-            redirect(action: "list")
+            response.status = 200
+			render flash.message
         }
         catch (DataIntegrityViolationException e) {
 			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'historial.label', default: 'Historial'), params.id])
-            redirect(action: "show", id: params.id)
+            response.status = 500
+			render flash.message
         }
     }
 }

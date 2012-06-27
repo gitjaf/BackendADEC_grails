@@ -21,10 +21,6 @@ class InstitucionController {
 		render instituciones as JSON
     }
 
-    def create() {
-        [institucionInstance: new Institucion(params)]
-    }
-
     def save() {
         def institucionInstance = new Institucion(request.JSON)
         if (!institucionInstance.save(flush: true)) {
@@ -35,7 +31,6 @@ class InstitucionController {
 		flash.message = message(code: 'default.created.message', args: [message(code: 'institucion.label', default: 'Institucion'), institucionInstance.id])
 		response.status = 201
 		render institucionInstance as JSON
-		
 	}
 
     def show() {
@@ -50,7 +45,6 @@ class InstitucionController {
 		render institucionInstance as JSON
     }
    
-
     def update() {
         def institucionInstance = Institucion.get(params.id)
         if (!institucionInstance) {

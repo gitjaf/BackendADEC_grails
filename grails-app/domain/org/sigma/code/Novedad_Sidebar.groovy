@@ -7,9 +7,9 @@ class Novedad_Sidebar {
 	String nombre
 	
     static constraints = {
-    	img(nullable: true)
-		evento(nullable: true)
-		nombre(nullable: true)
+    	img(nullable: false, blank: false)
+		evento(nullable: false, blank: false)
+		nombre(nullable: false, blank: false)
 		
 	}
 }

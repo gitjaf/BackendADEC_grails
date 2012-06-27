@@ -6,30 +6,29 @@ import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
 
-@TestFor(HistorialController)
-@Mock(Historial)
-class HistorialControllerTests {
+@TestFor(Novedad_SidebarController)
+@Mock(Novedad_Sidebar)
+class Novedad_SidebarControllerTests {
 
     def populateValidParams(params) {
       assert params != null
       // TODO: Populate valid properties like...
-      	 params['fecha'] = new Date() 
-  		 params['registro'] = 'valid_registro'
-  	 
-	  
+      params["img"] = 'unImg'
+	  params["evento"] = 'unEvento'
+	  params["nombre"] = 'unNombre'
     }
 
     void testIndex() {
         controller.index()
-        assert "/historial/list" == response.redirectedUrl
+        assert "/novedad_Sidebar/list" == response.redirectedUrl
     }
 
     void testList() {
 		request.method = "GET"
 		populateValidParams(params)
 		
-        def historial = new Historial(params)
-		assert historial.save() != null
+        def novedad_Sidebar = new Novedad_Sidebar(params)
+		assert novedad_Sidebar.save() != null
 		
 		response.format = "json"
 		
@@ -67,12 +66,12 @@ class HistorialControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def historial = new Historial(params)
-        assert historial.save() != null
+        def novedad_Sidebar = new Novedad_Sidebar(params)
+        assert novedad_Sidebar.save() != null
 
-        params.id = historial.id
+        params.id = novedad_Sidebar.id
 
-		mockDomain(Historial, [historial])
+		mockDomain(Novedad_Sidebar, [novedad_Sidebar])
         controller.show()
 
         assert response.status == 200
@@ -91,19 +90,16 @@ class HistorialControllerTests {
 		request.method = "PUT"
 
         populateValidParams(params)
-        def historial = new Historial(params)
-        assert historial.save() != null
+        def novedad_Sidebar = new Novedad_Sidebar(params)
+        assert novedad_Sidebar.save() != null
 
         // test invalid parameters in update
-        params.id = historial.id
-         	 params.fecha = null 
- 	 	 params.registro = null 
- 	 	 params.usuario = null 
- 	
+        params.id = novedad_Sidebar.id
+        params.nombre = ""
 
 		request.setJson(params as JSON)
 		
-		mockDomain(Historial, [historial])
+		mockDomain(Novedad_Sidebar, [novedad_Sidebar])
 		response.format = "json"
         controller.update()
 
@@ -116,14 +112,14 @@ class HistorialControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def historial = new Historial(params)
-		assert historial.save() != null
+        def novedad_Sidebar = new Novedad_Sidebar(params)
+		assert novedad_Sidebar.save() != null
 		
-		params.id = historial.id
+		params.id = novedad_Sidebar.id
 		
 		request.setJson(params as JSON)
 		
-		mockDomain(Historial, [historial])
+		mockDomain(Novedad_Sidebar, [novedad_Sidebar])
 		
 		controller.update()
 
@@ -136,15 +132,15 @@ class HistorialControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def historial = new Historial(params)
-		historial.version = 1
-		assert historial.save() != null
+		def novedad_Sidebar = new Novedad_Sidebar(params)
+		novedad_Sidebar.version = 1
+		assert novedad_Sidebar.save() != null
 		
-        params.id = historial.id
+        params.id = novedad_Sidebar.id
         params.version = -1
         request.setJson(params as JSON)
 		
-		mockDomain(Historial, [historial])
+		mockDomain(Novedad_Sidebar, [novedad_Sidebar])
 		
 		controller.update()
 
@@ -162,18 +158,18 @@ class HistorialControllerTests {
         response.reset()
 
         populateValidParams(params)
-        def historial = new Historial(params)
-        assert historial.save() != null
+        def novedad_Sidebar = new Novedad_Sidebar(params)
+        assert novedad_Sidebar.save() != null
 
-        params.id = historial.id
+        params.id = novedad_Sidebar.id
 		request.setJson(params as JSON)
 		
-		mockDomain(Historial, [historial])
+		mockDomain(Novedad_Sidebar, [novedad_Sidebar])
 		response.format = "json"
         controller.delete()
 
-        assert Historial.count() == 0
-        assert Historial.get(historial.id) == null
+        assert Novedad_Sidebar.count() == 0
+        assert Novedad_Sidebar.get(novedad_Sidebar.id) == null
         assert response.status == 200
 		assert flash.message != null
     }

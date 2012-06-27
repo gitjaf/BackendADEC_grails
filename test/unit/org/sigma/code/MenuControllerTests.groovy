@@ -6,30 +6,31 @@ import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
 
-@TestFor(HistorialController)
-@Mock(Historial)
-class HistorialControllerTests {
+@TestFor(MenuController)
+@Mock(Menu)
+class MenuControllerTests {
+
 
     def populateValidParams(params) {
-      assert params != null
       // TODO: Populate valid properties like...
-      	 params['fecha'] = new Date() 
-  		 params['registro'] = 'valid_registro'
-  	 
-	  
+      params["evento"] = "unEvento"
+	  params["img"] = "unImg"
+	  params["nombre"] = "unNombre"
+	  params["controller"] = "unController"
+      assert params != null
     }
 
     void testIndex() {
         controller.index()
-        assert "/historial/list" == response.redirectedUrl
+        assert "/menu/list" == response.redirectedUrl
     }
 
     void testList() {
 		request.method = "GET"
 		populateValidParams(params)
 		
-        def historial = new Historial(params)
-		assert historial.save() != null
+        def menu = new Menu(params)
+		assert menu.save() != null
 		
 		response.format = "json"
 		
@@ -37,6 +38,7 @@ class HistorialControllerTests {
 		
 		assert response.status == 200
 		assert response.json.size() == 1
+		
     }
 
     void testSave() {
@@ -54,6 +56,7 @@ class HistorialControllerTests {
 
         assert response.status == 201
         assert response.json != null
+
     }
 
     void testShow() {
@@ -67,16 +70,17 @@ class HistorialControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def historial = new Historial(params)
-        assert historial.save() != null
+        def menu = new Menu(params)
+        assert menu.save() != null
 
-        params.id = historial.id
+        params.id = menu.id
 
-		mockDomain(Historial, [historial])
+		mockDomain(Menu, [menu])
         controller.show()
 
         assert response.status == 200
 		assert response.json != null
+		
     }
 
     void testUpdateInexistente() {
@@ -85,30 +89,30 @@ class HistorialControllerTests {
 
         assert response.status == 404
         assert flash.message != null
+
     }
 	
 	void testUpdateInvalido(){
 		request.method = "PUT"
 
         populateValidParams(params)
-        def historial = new Historial(params)
-        assert historial.save() != null
+        def menu = new Menu(params)
+        assert menu.save() != null
 
         // test invalid parameters in update
-        params.id = historial.id
-         	 params.fecha = null 
- 	 	 params.registro = null 
- 	 	 params.usuario = null 
- 	
+        params.id = menu.id
+		params.controller = ""
 
 		request.setJson(params as JSON)
 		
-		mockDomain(Historial, [historial])
+		mockDomain(Menu, [menu])
 		response.format = "json"
         controller.update()
 
         assert response.status == 500
         assert response.json != null
+		
+
 	}
 	
 	void testUpdateValido(){
@@ -116,14 +120,14 @@ class HistorialControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def historial = new Historial(params)
-		assert historial.save() != null
+        def menu = new Menu(params)
+		assert menu.save() != null
 		
-		params.id = historial.id
+		params.id = menu.id
 		
 		request.setJson(params as JSON)
 		
-		mockDomain(Historial, [historial])
+		mockDomain(Menu, [menu])
 		
 		controller.update()
 
@@ -132,19 +136,20 @@ class HistorialControllerTests {
 	}
 	
 	void testUpdateConcurrente(){
+		
 		request.method = "PUT"
 		response.format = "json"
 		
         populateValidParams(params)
-		def historial = new Historial(params)
-		historial.version = 1
-		assert historial.save() != null
+		def menu = new Menu(params)
+		menu.version = 1
+		assert menu.save() != null
 		
-        params.id = historial.id
+        params.id = menu.id
         params.version = -1
         request.setJson(params as JSON)
 		
-		mockDomain(Historial, [historial])
+		mockDomain(Menu, [menu])
 		
 		controller.update()
 
@@ -162,18 +167,18 @@ class HistorialControllerTests {
         response.reset()
 
         populateValidParams(params)
-        def historial = new Historial(params)
-        assert historial.save() != null
+        def menu = new Menu(params)
+        assert menu.save() != null
 
-        params.id = historial.id
+        params.id = menu.id
 		request.setJson(params as JSON)
 		
-		mockDomain(Historial, [historial])
+		mockDomain(Menu, [menu])
 		response.format = "json"
         controller.delete()
 
-        assert Historial.count() == 0
-        assert Historial.get(historial.id) == null
+        assert Menu.count() == 0
+        assert Menu.get(menu.id) == null
         assert response.status == 200
 		assert flash.message != null
     }

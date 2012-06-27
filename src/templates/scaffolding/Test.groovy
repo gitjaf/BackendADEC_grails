@@ -1,35 +1,38 @@
-package org.sigma.code
-
-
+<%=packageName ? "package ${packageName}\n\n" : ''%>
 
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
 
-@TestFor(HistorialController)
-@Mock(Historial)
-class HistorialControllerTests {
+@TestFor(${className}Controller)
+@Mock(${className})
+class ${className}ControllerTests {
 
     def populateValidParams(params) {
-      assert params != null
-      // TODO: Populate valid properties like...
-      	 params['fecha'] = new Date() 
-  		 params['registro'] = 'valid_registro'
-  	 
+      <%domainClass.properties.each{
+		  print ((it.type == String.class)? "\t params['${it.name}'] = 'valid_${it.name}'\n  \t " :
+		  (it.type == Boolean.class)? "\t params['${it.name}'] = ${true} \n  \t" : 
+		  (it.type == Date.class)? "\t params['${it.name}'] = new Date() \n  \t" :
+		  (it.type == Long.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1} \n  \t " :
+		  (it.type == Integer.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1} \n  \t " :
+		  (it.type == Double.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1.0d} \n  \t " :
+		  (it.type == Float.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1.0f} \n  \t " : "")
+	  }%>
+	  assert params != null
 	  
     }
 
     void testIndex() {
         controller.index()
-        assert "/historial/list" == response.redirectedUrl
+        assert "/$propertyName/list" == response.redirectedUrl
     }
 
     void testList() {
 		request.method = "GET"
 		populateValidParams(params)
 		
-        def historial = new Historial(params)
-		assert historial.save() != null
+        def ${propertyName} = new ${className}(params)
+		assert ${propertyName}.save() != null
 		
 		response.format = "json"
 		
@@ -37,6 +40,7 @@ class HistorialControllerTests {
 		
 		assert response.status == 200
 		assert response.json.size() == 1
+		assert response.json.
     }
 
     void testSave() {
@@ -67,12 +71,12 @@ class HistorialControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def historial = new Historial(params)
-        assert historial.save() != null
+        def ${propertyName} = new ${className}(params)
+        assert ${propertyName}.save() != null
 
-        params.id = historial.id
+        params.id = ${propertyName}.id
 
-		mockDomain(Historial, [historial])
+		mockDomain(${className}, [${propertyName}])
         controller.show()
 
         assert response.status == 200
@@ -91,19 +95,18 @@ class HistorialControllerTests {
 		request.method = "PUT"
 
         populateValidParams(params)
-        def historial = new Historial(params)
-        assert historial.save() != null
+        def ${propertyName} = new ${className}(params)
+        assert ${propertyName}.save() != null
 
         // test invalid parameters in update
-        params.id = historial.id
-         	 params.fecha = null 
- 	 	 params.registro = null 
- 	 	 params.usuario = null 
- 	
+        params.id = ${propertyName}.id
+        <%domainClass.properties.each{
+		print((!it.optional & it.name != "id" & it.name != "version") ? " \t params.${it.name} = null \n \t" : "" )
+		}%>
 
 		request.setJson(params as JSON)
 		
-		mockDomain(Historial, [historial])
+		mockDomain(${className}, [${propertyName}])
 		response.format = "json"
         controller.update()
 
@@ -116,14 +119,14 @@ class HistorialControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def historial = new Historial(params)
-		assert historial.save() != null
+        def ${propertyName} = new ${className}(params)
+		assert ${propertyName}.save() != null
 		
-		params.id = historial.id
+		params.id = ${propertyName}.id
 		
 		request.setJson(params as JSON)
 		
-		mockDomain(Historial, [historial])
+		mockDomain(${className}, [${propertyName}])
 		
 		controller.update()
 
@@ -136,15 +139,15 @@ class HistorialControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def historial = new Historial(params)
-		historial.version = 1
-		assert historial.save() != null
+		def ${propertyName} = new ${className}(params)
+		${propertyName}.version = 1
+		assert ${propertyName}.save() != null
 		
-        params.id = historial.id
+        params.id = ${propertyName}.id
         params.version = -1
         request.setJson(params as JSON)
 		
-		mockDomain(Historial, [historial])
+		mockDomain(${className}, [${propertyName}])
 		
 		controller.update()
 
@@ -162,18 +165,18 @@ class HistorialControllerTests {
         response.reset()
 
         populateValidParams(params)
-        def historial = new Historial(params)
-        assert historial.save() != null
+        def ${propertyName} = new ${className}(params)
+        assert ${propertyName}.save() != null
 
-        params.id = historial.id
+        params.id = ${propertyName}.id
 		request.setJson(params as JSON)
 		
-		mockDomain(Historial, [historial])
+		mockDomain(${className}, [${propertyName}])
 		response.format = "json"
         controller.delete()
 
-        assert Historial.count() == 0
-        assert Historial.get(historial.id) == null
+        assert ${className}.count() == 0
+        assert ${className}.get(${propertyName}.id) == null
         assert response.status == 200
 		assert flash.message != null
     }
