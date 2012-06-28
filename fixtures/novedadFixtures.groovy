@@ -1,7 +1,6 @@
 
 include "novedadSidebarFixtures"
 
-
 build{
 		novedad1(org.sigma.code.Novedad, titulo: "Titulo 1", cuerpo: "Cuerpo 1", fecha: new Date(), leido: "false", categoria: categoria1)
 		novedad2(org.sigma.code.Novedad, titulo: "Titulo 2", cuerpo: "Cuerpo 2", fecha: new Date(), leido: "false", categoria: categoria2)

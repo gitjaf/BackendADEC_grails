@@ -1,38 +1,35 @@
-<%=packageName ? "package ${packageName}\n\n" : ''%>
+package org.sigma.code
+
+
 
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
 
-@TestFor(${className}Controller)
-@Mock(${className})
-class ${className}ControllerTests {
+@TestFor(SeccionController)
+@Mock(Seccion)
+class SeccionControllerTests {
 
     def populateValidParams(params) {
-      <%domainClass.properties.each{
-		  print ((it.type == String.class)? "\t params['${it.name}'] = 'valid_${it.name}'\n  \t " :
-		  (it.type == Boolean.class)? "\t params['${it.name}'] = ${true} \n  \t" : 
-		  (it.type == Date.class)? "\t params['${it.name}'] = '22/01/2012' \n  \t" :
-		  (it.type == Long.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1} \n  \t " :
-		  (it.type == Integer.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1} \n  \t " :
-		  (it.type == Double.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1.0d} \n  \t " :
-		  (it.type == Float.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1.0f} \n  \t " : "")
-	  }%>
+      	 params['evento'] = 'valid_evento'
+  	 	 params['img'] = 'valid_img'
+  	 	 params['nombre'] = 'valid_nombre'
+  	 
 	  assert params != null
 	  
     }
 
     void testIndex() {
         controller.index()
-        assert "/$propertyName/list" == response.redirectedUrl
+        assert "/seccion/list" == response.redirectedUrl
     }
 
     void testList() {
 		request.method = "GET"
 		populateValidParams(params)
 		
-        def ${propertyName} = new ${className}(params)
-		assert ${propertyName}.save() != null
+        def seccion = new Seccion(params)
+		assert seccion.save() != null
 		
 		response.format = "json"
 		
@@ -70,12 +67,12 @@ class ${className}ControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def ${propertyName} = new ${className}(params)
-        assert ${propertyName}.save() != null
+        def seccion = new Seccion(params)
+        assert seccion.save() != null
 
-        params.id = ${propertyName}.id
+        params.id = seccion.id
 
-		mockDomain(${className}, [${propertyName}])
+		mockDomain(Seccion, [seccion])
         controller.show()
 
         assert response.status == 200
@@ -94,18 +91,19 @@ class ${className}ControllerTests {
 		request.method = "PUT"
 
         populateValidParams(params)
-        def ${propertyName} = new ${className}(params)
-        assert ${propertyName}.save() != null
+        def seccion = new Seccion(params)
+        assert seccion.save() != null
 
         // test invalid parameters in update
-        params.id = ${propertyName}.id
-        <%domainClass.properties.each{
-		print((!it.optional & it.name != "id" & it.name != "version") ? " \t params.${it.name} = '' \n \t" : "" )
-		}%>
+        params.id = seccion.id
+         	 params.evento = '' 
+ 	 	 params.img = '' 
+ 	 	 params.nombre = '' 
+ 	
 
 		request.setJson(params as JSON)
 		
-		mockDomain(${className}, [${propertyName}])
+		mockDomain(Seccion, [seccion])
 		response.format = "json"
         controller.update()
 
@@ -118,14 +116,14 @@ class ${className}ControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def ${propertyName} = new ${className}(params)
-		assert ${propertyName}.save() != null
+        def seccion = new Seccion(params)
+		assert seccion.save() != null
 		
-		params.id = ${propertyName}.id
+		params.id = seccion.id
 		
 		request.setJson(params as JSON)
 		
-		mockDomain(${className}, [${propertyName}])
+		mockDomain(Seccion, [seccion])
 		
 		controller.update()
 
@@ -138,15 +136,15 @@ class ${className}ControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def ${propertyName} = new ${className}(params)
-		${propertyName}.version = 1
-		assert ${propertyName}.save() != null
+		def seccion = new Seccion(params)
+		seccion.version = 1
+		assert seccion.save() != null
 		
-        params.id = ${propertyName}.id
+        params.id = seccion.id
         params.version = -1
         request.setJson(params as JSON)
 		
-		mockDomain(${className}, [${propertyName}])
+		mockDomain(Seccion, [seccion])
 		
 		controller.update()
 
@@ -164,18 +162,18 @@ class ${className}ControllerTests {
         response.reset()
 
         populateValidParams(params)
-        def ${propertyName} = new ${className}(params)
-        assert ${propertyName}.save() != null
+        def seccion = new Seccion(params)
+        assert seccion.save() != null
 
-        params.id = ${propertyName}.id
+        params.id = seccion.id
 		request.setJson(params as JSON)
 		
-		mockDomain(${className}, [${propertyName}])
+		mockDomain(Seccion, [seccion])
 		response.format = "json"
         controller.delete()
 
-        assert ${className}.count() == 0
-        assert ${className}.get(${propertyName}.id) == null
+        assert Seccion.count() == 0
+        assert Seccion.get(seccion.id) == null
         assert response.status == 200
 		assert flash.message != null
     }

@@ -5,16 +5,21 @@ package org.sigma.code
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
+import java.text.SimpleDateFormat
 
 @TestFor(HistorialController)
-@Mock(Historial)
+@Mock([Historial, Usuario, Perfil])
 class HistorialControllerTests {
 
     def populateValidParams(params) {
       assert params != null
       // TODO: Populate valid properties like...
-      	 params['fecha'] = new Date() 
+      	 params['fecha'] = "22/01/2012"
   		 params['registro'] = 'valid_registro'
+         def perfil = new Perfil(id: 1, descripcion: 'ADEC')
+		 def usuario = new Usuario(id: 1, apellido: "unApellido", email: "unEmail", nombre: "unNombre", username: "unUsername", password: "unPassword", perfil: perfil)
+		 assert usuario.save() != null
+		 params['usuario'] = usuario 
   	 
 	  
     }
@@ -29,6 +34,12 @@ class HistorialControllerTests {
 		populateValidParams(params)
 		
         def historial = new Historial(params)
+		historial.fecha = params.date("fecha", "dd/MM/yyyy")
+		
+		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
+		* la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
+		*/
+		historial.clearErrors()
 		assert historial.save() != null
 		
 		response.format = "json"
@@ -41,15 +52,18 @@ class HistorialControllerTests {
 
     void testSave() {
 		request.method = "POST"
+		response.format = "json"
+	
         controller.save()
 
         assert response.status == 500
-		
         response.reset()
-		response.format = "json"
 		
         populateValidParams(params)
+        mockDomain(Usuario, [params.usuario])
+		params.idUsuario = params.usuario.id
         request.setJson(params as JSON)
+		
 		controller.save()
 
         assert response.status == 201
@@ -68,6 +82,12 @@ class HistorialControllerTests {
 		
         populateValidParams(params)
         def historial = new Historial(params)
+		historial.fecha = params.date("fecha", "dd/MM/yyyy")
+		
+		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
+		* la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
+		*/
+		historial.clearErrors()
         assert historial.save() != null
 
         params.id = historial.id
@@ -92,13 +112,19 @@ class HistorialControllerTests {
 
         populateValidParams(params)
         def historial = new Historial(params)
+		historial.fecha = params.date("fecha", "dd/MM/yyyy")
+		
+		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
+		* la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
+		*/
+		historial.clearErrors()
         assert historial.save() != null
 
         // test invalid parameters in update
         params.id = historial.id
-         	 params.fecha = null 
- 	 	 params.registro = null 
- 	 	 params.usuario = null 
+         	 params.fecha = "" 
+ 	 	 params.registro = "" 
+ 	 	 params.usuario = "" 
  	
 
 		request.setJson(params as JSON)
@@ -117,6 +143,12 @@ class HistorialControllerTests {
 		
         populateValidParams(params)
         def historial = new Historial(params)
+		historial.fecha = params.date("fecha", "dd/MM/yyyy")
+		
+		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
+		* la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
+		*/
+		historial.clearErrors()
 		assert historial.save() != null
 		
 		params.id = historial.id
@@ -137,6 +169,12 @@ class HistorialControllerTests {
 		
         populateValidParams(params)
 		def historial = new Historial(params)
+		historial.fecha = params.date("fecha", "dd/MM/yyyy")
+		
+		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
+		* la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
+		*/
+		historial.clearErrors()
 		historial.version = 1
 		assert historial.save() != null
 		
@@ -163,6 +201,12 @@ class HistorialControllerTests {
 
         populateValidParams(params)
         def historial = new Historial(params)
+		historial.fecha = params.date("fecha", "dd/MM/yyyy")
+		
+		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
+		* la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
+		*/
+		historial.clearErrors()
         assert historial.save() != null
 
         params.id = historial.id

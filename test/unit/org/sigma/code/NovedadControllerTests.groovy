@@ -35,6 +35,7 @@ class NovedadControllerTests {
         
 		def novedad = new Novedad(params)
 		novedad.fecha = new SimpleDateFormat("dd/MM/yyyy").parse(params.fecha)
+		
 		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
 		* la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
 		*/
@@ -82,6 +83,7 @@ class NovedadControllerTests {
         populateValidParams(params)
         def novedad = new Novedad(params)
 		novedad.fecha = new SimpleDateFormat("dd/MM/yyyy").parse(params.fecha)
+		
 		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
 		* la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
 		*/
@@ -111,6 +113,7 @@ class NovedadControllerTests {
 		populateValidParams(params)
 		def novedad = new Novedad(params)
 		novedad.fecha = new SimpleDateFormat("dd/MM/yyyy").parse(params.fecha)
+		
 		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
 		 * la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
 		 */
@@ -143,6 +146,7 @@ class NovedadControllerTests {
         populateValidParams(params)
         def novedad = new Novedad(params)
 		novedad.fecha = new SimpleDateFormat("dd/MM/yyyy").parse(params.fecha)
+		
 		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
 		 * la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
 		 */
@@ -199,6 +203,7 @@ class NovedadControllerTests {
         populateValidParams(params)
         def novedad = new Novedad(params)
 		novedad.fecha = new SimpleDateFormat("dd/MM/yyyy").parse(params.fecha)
+		
 		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
 		 * la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
 		 */

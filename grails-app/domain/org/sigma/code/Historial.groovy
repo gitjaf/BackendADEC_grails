@@ -8,7 +8,7 @@ class Historial {
 	Usuario usuario
 	
     static constraints = {
-    	fecha(nullable: false)
+    	fecha(nullable: false, required: true)
 		registro(nullable: false)
 		
 	}
