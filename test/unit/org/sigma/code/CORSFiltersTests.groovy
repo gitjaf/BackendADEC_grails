@@ -8,6 +8,6 @@ import grails.test.mixin.*
 class CORSFiltersTests {
 
     void testSomething() {
-        fail "Implement me"
+        fail "Implement me" 
     }
 }

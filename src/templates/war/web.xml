@@ -46,6 +46,17 @@
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>ERROR</dispatcher>
     </filter-mapping>
+    
+    <filter>
+    	<filter-name>CORSFilter</filter-name>
+    	<filter-class>org.sigma.code.CORSFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+    	<filter-name>CORSFilter</filter-name>
+    	<url-pattern>/*</url-pattern>
+	</filter-mapping>
+    
 
     <listener>
         <listener-class>org.codehaus.groovy.grails.web.context.GrailsContextLoaderListener</listener-class>

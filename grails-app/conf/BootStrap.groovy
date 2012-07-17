@@ -11,19 +11,22 @@ class BootStrap {
 		boolean isProd = GrailsUtil.environment == GrailsApplication.ENV_PRODUCTION
 		
 		if (!isProd){
-			fixtureLoader.load('novedadFixtures')
-			fixtureLoader.load('seccionFixtures')
-			fixtureLoader.load('menuFixtures')
-			fixtureLoader.load('historialFixtures')
+			fixtureLoader.load('usuarioFixtures')
 			fixtureLoader.load('institucionFixtures')   // Ommit the .groovy extension!
-			assert Usuario.count == 5
-			assert Perfil.count == 4
+			fixtureLoader.load('localidadFixtures')
+			assert Usuario.count == 10
+			assert Perfil.count == 9
 			assert Novedad.count == 5
-			assert Novedad_Sidebar.count == 5
+			assert Categoria.count == 5
 			assert Seccion.count == 5
 			assert Menu.count == 5
 			assert Historial.count == 5
 			assert Institucion.count == 5
+			assert Localidad.count == 5
+			assert CampoTabla.count == 5
+			assert Curso.count == 5
+			assert Tab.count == 5
+			
 			
 		}
 		

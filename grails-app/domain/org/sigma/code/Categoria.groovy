@@ -1,6 +1,6 @@
 package org.sigma.code
 
-class Novedad_Sidebar {
+class Categoria {
 
 	String img
 	String evento

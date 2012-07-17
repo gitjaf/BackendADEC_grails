@@ -5,12 +5,17 @@ class Historial {
 	Date fecha
 	String registro
 	
-	Usuario usuario
+	static belongsTo = [usuario: Usuario]
 	
     static constraints = {
     	fecha(nullable: false, required: true)
 		registro(nullable: false)
 		
 	}
+	
+	static mapping = {
+		usuario cascade: "save-update"
+	}
+	
 }
 

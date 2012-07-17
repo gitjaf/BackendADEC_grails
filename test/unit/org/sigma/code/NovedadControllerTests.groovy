@@ -9,14 +9,14 @@ import grails.test.mixin.*
 import grails.converters.JSON
 
 @TestFor(NovedadController)
-@Mock([Novedad, Novedad_Sidebar])
+@Mock([Novedad, Categoria])
 class NovedadControllerTests {
 
     def populateValidParams(params) {
       	 params['cuerpo'] = 'valid_cuerpo'
   		 params['leido'] = true 
   		 params['titulo'] = 'valid_titulo'
-		 def categoria = new Novedad_Sidebar(id: 1, img: "imagen", evento: "evento", nombre: "nombre")
+		 def categoria = new Categoria(id: 1, img: "imagen", evento: "evento", nombre: "nombre")
 		 assert categoria.save() != null
 		 params['categoria'] = categoria
 		 params['fecha'] = "20/01/2012"
@@ -60,7 +60,7 @@ class NovedadControllerTests {
         response.reset()
 		
         populateValidParams(params)
-		mockDomain(Novedad_Sidebar, [params.categoria])
+		mockDomain(Categoria, [params.categoria])
 		params.idCategoria = params.categoria.id
         request.setJson(params as JSON)
 

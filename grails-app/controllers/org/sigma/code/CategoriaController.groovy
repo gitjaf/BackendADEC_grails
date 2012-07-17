@@ -4,7 +4,7 @@ package org.sigma.code
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
 
-class Novedad_SidebarController {
+class CategoriaController {
 
     static allowedMethods = [show: ["GET", "POST"], save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -15,7 +15,7 @@ class Novedad_SidebarController {
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		
-		def novedad_SidebarInstanceList = Novedad_Sidebar.list()
+		def novedad_SidebarInstanceList = Categoria.list()
 		
 		response.status = 200
 		
@@ -23,7 +23,7 @@ class Novedad_SidebarController {
     }
     
     def save() {
-        def novedad_SidebarInstance = new Novedad_Sidebar(request.JSON)
+        def novedad_SidebarInstance = new Categoria(request.JSON)
         if (!novedad_SidebarInstance.save(flush: true)) {
 			response.status = 500
 			return
@@ -35,7 +35,7 @@ class Novedad_SidebarController {
     }
 
     def show() {
-        def novedad_SidebarInstance = Novedad_Sidebar.get(params.id)
+        def novedad_SidebarInstance = Categoria.get(params.id)
         if (!novedad_SidebarInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [message(code: 'novedad_Sidebar.label', default: 'Novedad_Sidebar'), params.id])
             response.status = 404
@@ -47,7 +47,7 @@ class Novedad_SidebarController {
     }
 
     def update() {
-        def novedad_SidebarInstance = Novedad_Sidebar.get(params.id)
+        def novedad_SidebarInstance = Categoria.get(params.id)
         if (!novedad_SidebarInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'novedad_Sidebar.label', default: 'Novedad_Sidebar'), params.id])
             response.status = 404
@@ -78,7 +78,7 @@ class Novedad_SidebarController {
     }
 
     def delete() {
-        def novedad_SidebarInstance = Novedad_Sidebar.get(params.id)
+        def novedad_SidebarInstance = Categoria.get(params.id)
         if (!novedad_SidebarInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [message(code: 'novedad_Sidebar.label', default: 'Novedad_Sidebar'), params.id])
             response.status = 404

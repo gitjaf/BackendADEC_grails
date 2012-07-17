@@ -5,7 +5,7 @@ import grails.test.mixin.*
 import grails.converters.JSON
 
 @TestFor(InstitucionController)
-@Mock(Institucion)
+@Mock([Institucion, Curso])
 class InstitucionControllerTests {
 
 

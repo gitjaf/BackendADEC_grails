@@ -6,29 +6,29 @@ import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
 
-@TestFor(Novedad_SidebarController)
-@Mock(Novedad_Sidebar)
-class Novedad_SidebarControllerTests {
+@TestFor(CampoTablaController)
+@Mock([CampoTabla, Usuario, Perfil])
+class CampoTablaControllerTests {
 
     def populateValidParams(params) {
-      assert params != null
-      // TODO: Populate valid properties like...
-      params["img"] = 'unImg'
-	  params["evento"] = 'unEvento'
-	  params["nombre"] = 'unNombre'
+      	 params['descripcion'] = 'valid_descripcion'
+  	 	 params['nombre'] = 'valid_nombre'
+  	 
+	  assert params != null
+	  
     }
 
     void testIndex() {
         controller.index()
-        assert "/novedad_Sidebar/list" == response.redirectedUrl
+        assert "/campoTabla/list" == response.redirectedUrl
     }
 
     void testList() {
 		request.method = "GET"
 		populateValidParams(params)
 		
-        def novedad_Sidebar = new Novedad_Sidebar(params)
-		assert novedad_Sidebar.save() != null
+        def campoTabla = new CampoTabla(params)
+		assert campoTabla.save() != null
 		
 		response.format = "json"
 		
@@ -66,12 +66,12 @@ class Novedad_SidebarControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def novedad_Sidebar = new Novedad_Sidebar(params)
-        assert novedad_Sidebar.save() != null
+        def campoTabla = new CampoTabla(params)
+        assert campoTabla.save() != null
 
-        params.id = novedad_Sidebar.id
+        params.id = campoTabla.id
 
-		mockDomain(Novedad_Sidebar, [novedad_Sidebar])
+		mockDomain(CampoTabla, [campoTabla])
         controller.show()
 
         assert response.status == 200
@@ -90,16 +90,18 @@ class Novedad_SidebarControllerTests {
 		request.method = "PUT"
 
         populateValidParams(params)
-        def novedad_Sidebar = new Novedad_Sidebar(params)
-        assert novedad_Sidebar.save() != null
+        def campoTabla = new CampoTabla(params)
+        assert campoTabla.save() != null
 
         // test invalid parameters in update
-        params.id = novedad_Sidebar.id
-        params.nombre = ""
+        params.id = campoTabla.id
+         	 params.descripcion = '' 
+ 	 	 params.nombre = '' 
+ 	
 
 		request.setJson(params as JSON)
 		
-		mockDomain(Novedad_Sidebar, [novedad_Sidebar])
+		mockDomain(CampoTabla, [campoTabla])
 		response.format = "json"
         controller.update()
 
@@ -112,14 +114,14 @@ class Novedad_SidebarControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def novedad_Sidebar = new Novedad_Sidebar(params)
-		assert novedad_Sidebar.save() != null
+        def campoTabla = new CampoTabla(params)
+		assert campoTabla.save() != null
 		
-		params.id = novedad_Sidebar.id
+		params.id = campoTabla.id
 		
 		request.setJson(params as JSON)
 		
-		mockDomain(Novedad_Sidebar, [novedad_Sidebar])
+		mockDomain(CampoTabla, [campoTabla])
 		
 		controller.update()
 
@@ -132,15 +134,15 @@ class Novedad_SidebarControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def novedad_Sidebar = new Novedad_Sidebar(params)
-		novedad_Sidebar.version = 1
-		assert novedad_Sidebar.save() != null
+		def campoTabla = new CampoTabla(params)
+		campoTabla.version = 1
+		assert campoTabla.save() != null
 		
-        params.id = novedad_Sidebar.id
+        params.id = campoTabla.id
         params.version = -1
         request.setJson(params as JSON)
 		
-		mockDomain(Novedad_Sidebar, [novedad_Sidebar])
+		mockDomain(CampoTabla, [campoTabla])
 		
 		controller.update()
 
@@ -158,18 +160,18 @@ class Novedad_SidebarControllerTests {
         response.reset()
 
         populateValidParams(params)
-        def novedad_Sidebar = new Novedad_Sidebar(params)
-        assert novedad_Sidebar.save() != null
+        def campoTabla = new CampoTabla(params)
+        assert campoTabla.save() != null
 
-        params.id = novedad_Sidebar.id
+        params.id = campoTabla.id
 		request.setJson(params as JSON)
 		
-		mockDomain(Novedad_Sidebar, [novedad_Sidebar])
+		mockDomain(CampoTabla, [campoTabla])
 		response.format = "json"
         controller.delete()
 
-        assert Novedad_Sidebar.count() == 0
-        assert Novedad_Sidebar.get(novedad_Sidebar.id) == null
+        assert CampoTabla.count() == 0
+        assert CampoTabla.get(campoTabla.id) == null
         assert response.status == 200
 		assert flash.message != null
     }

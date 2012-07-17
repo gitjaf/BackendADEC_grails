@@ -13,8 +13,9 @@ class Usuario {
 	String telefono
 	String email
 	
-	Perfil perfil
+	static belongsTo = [perfil: Perfil]
 	
+	static hasMany = [campos: CampoTabla, tabs: Tab, historiales: Historial]
 	
     static constraints = {
 		nombre(required: true, blank: false)
@@ -26,8 +27,15 @@ class Usuario {
 		direccion(nullable: true)
 		telefono(nullable: true)
 		empresa(nullable: true)
-		
     }
-	
+
+	static mapping = {
+		tabs cascade: "save-update"
+		campos cascade: "save-update"
+		perfil cascade: "save-update" 
+		historiales cascade: "all"
+		
+	}
+		
 	
 }

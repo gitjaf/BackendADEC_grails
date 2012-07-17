@@ -17,27 +17,28 @@ class UsuarioController {
 		
 		def usuarios = Usuario.list()
 
+//		println usuarios.properties
+		
 		response.status = 200
 		
-		if (params.callback) {
-			render (
-					text: "${params.callback}(${usuarios as JSON})",
-					contentType: "text/javascript",
-					encoding: "UTF-8"
-					)
-		} else {
-			render usuarios as JSON
-		}
+		render usuarios as JSON
 		
     }
 
     def save() {
         def usuarioInstance = new Usuario(request.JSON)
+		println request.JSON
+		println params
+		println usuarioInstance.properties
 		def perfil = Perfil.get(request.JSON.idPerfil)
 		usuarioInstance.perfil = perfil
-        
+		request.JSON?.idCampos?.each { id -> usuarioInstance.addToCampos(CampoTabla.get(id))}
+		request.JSON?.idTabs?.each { id -> usuarioInstance.addToTabs(Tab.get(id))}
+		
 		if (!usuarioInstance.save(flush: true)) {
+			flash.message = message(code: 'default.created.message', args: [message(code: 'usuario.label', default: 'Usuario'), usuarioInstance.id])
 			response.status = 500
+			render flash.message
             return
         }
 
@@ -70,6 +71,7 @@ class UsuarioController {
         }
 		
 		
+		
     }
 
 
@@ -93,6 +95,18 @@ class UsuarioController {
         }
 		
         usuarioInstance.properties = request.JSON
+		
+		usuarioInstance.perfil = (request.JSON?.idPerfil) ?  Perfil.get(request.JSON.idPerfil) : usuarioInstance.perfil
+		
+		if(request.JSON?.idCampos || request.JSON?.idCampos?.isEmpty()){
+			usuarioInstance.campos?.clear()
+			request.JSON.idCampos.each{id -> usuarioInstance.addToCampos(CampoTabla.get(id))}
+		}
+		
+		if(request.JSON?.idTabs || request.JSON?.idTabs?.isEmpty()){
+			usuarioInstance.tabs?.clear()
+			request.JSON.idTabs.each{id -> usuarioInstance.addToTabs(Tab.get(id))}
+		}
 				
         if (!usuarioInstance.save(flush: true)) {
             response.status = 500

@@ -23,6 +23,8 @@ class InstitucionController {
 
     def save() {
         def institucionInstance = new Institucion(request.JSON)
+		request.JSON.idCursos.each {id -> institucionInstance.cursos.add(Curso.get(id))}
+		
         if (!institucionInstance.save(flush: true)) {
             response.status = 500
 			return
@@ -64,6 +66,11 @@ class InstitucionController {
         }
 
         institucionInstance.properties = request.JSON
+        
+		if(request.JSON?.idCursos || request.JSON?.idCursos?.isEmpty()){
+			institucionInstance.cursos?.clear()
+			request.JSON.idCursos.each {id -> institucionInstance.cursos.add(Curso.get(id))}
+		}
 
         if (!institucionInstance.save(flush: true)) {
             response.status = 500

@@ -24,6 +24,13 @@ class PerfilController {
 
     def save() {
         def perfilInstance = new Perfil(request.JSON)
+		request.JSON?.idCampos?.each{id -> perfilInstance.campos.add(CampoTabla.get(id))}
+		request.JSON?.idMenues?.each{id -> perfilInstance.menues.add(Menu.get(id))}
+		request.JSON?.idSecciones?.each{id -> perfilInstance.secciones.add(Seccion.get(id))}
+		request.JSON?.idCategorias?.each{id -> perfilInstance.categorias.add(Categoria.get(id))}
+		request.JSON?.idNovedades?.each{id -> perfilInstance.novedades.add(Novedad.get(id))}
+		request.JSON?.idUsuarios?.each{id -> perfilInstance.usuarios.add(Usuario.get(id))}
+		
         if (!perfilInstance.save(flush: true)) {
 			response.status = 500
             return
@@ -70,13 +77,43 @@ class PerfilController {
         }
 				
         perfilInstance.properties = request.JSON
+		
+		if(request.JSON?.idCampos || request.JSON?.idCampos?.isEmpty()){
+			perfilInstance.campos.clear()
+			request.JSON.idCampos.each{id -> perfilInstance.campos.add(CampoTabla.get(id))}
+		}
+		
+		if(request.JSON?.idMenues){
+			perfilInstance.menues.clear()
+			request.JSON.idMenues.each{id -> perfilInstance.menues.add(Menu.get(id))}
+		}
+		
+		if(request.JSON?.idSecciones){
+			perfilInstance.secciones.clear()
+			request.JSON.idSecciones.each{id -> perfilInstance.secciones.add(Seccion.get(id))}
+		}
+		
+		if(request.JSON?.idNovedades){
+			perfilInstance.novedades.clear()
+			request.JSON.idNovedades.each{id -> perfilInstance.novedades.add(Novedad.get(id))}
+		}
+		
+		if(request.JSON?.idCategorias){
+			perfilInstance.categorias.clear()
+			request.JSON.idCategorias.each{id -> perfilInstance.categorias.add(Categoria.get(id))}
+		}
+
+		if(request.JSON?.idUsuarios){
+			perfilInstance.usuarios.clear()
+			request.JSON.idUsuarios.each{id -> perfilInstance.usuarios.add(Usuario.get(id))}
+		}
 
         if (!perfilInstance.save(flush: true)) {
             response.status = 500
 			render perfilInstance as JSON
             return
         }
-
+		
 		flash.message = message(code: 'default.updated.message', args: [message(code: 'perfil.label', default: 'Perfil'), perfilInstance.id])
         response.status = 200
 		render perfilInstance as JSON

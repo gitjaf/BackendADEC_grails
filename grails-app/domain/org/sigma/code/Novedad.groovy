@@ -7,7 +7,7 @@ class Novedad {
 	Boolean leido = false
 	Date fecha
 	
-	Novedad_Sidebar categoria
+	Categoria categoria
 	
     static constraints = {
 		fecha(nullable: false, required: true)

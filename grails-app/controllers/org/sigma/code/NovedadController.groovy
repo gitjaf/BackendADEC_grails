@@ -28,7 +28,7 @@ class NovedadController {
         def novedadInstance = new Novedad()
         bindData(novedadInstance, request.JSON, ['fecha'])
 		novedadInstance.fecha = request.JSON.fecha ? new SimpleDateFormat("dd/MM/yyyy").parse(request.JSON.fecha) : null
-		novedadInstance.categoria = Novedad_Sidebar.get(request.JSON.idCategoria)
+		novedadInstance.categoria = Categoria.get(request.JSON.idCategoria)
 		if (!novedadInstance.save(flush: true)) {
 			response.status = 500
 			return
