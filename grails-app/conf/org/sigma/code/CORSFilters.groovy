@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse
 
 
 // FILTRO ESTATICO
-class CORSFilter implements Filter {
+class CORSFilters implements Filter {
 	public void init(FilterConfig fConfig) throws ServletException { }
 
 	public void destroy() { }
