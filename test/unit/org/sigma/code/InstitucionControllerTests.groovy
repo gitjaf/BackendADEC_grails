@@ -1,19 +1,27 @@
 package org.sigma.code
 
+
+
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
+import grails.buildtestdata.mixin.Build
 
 @TestFor(InstitucionController)
-@Mock([Institucion, Curso])
+@Build(Institucion)
 class InstitucionControllerTests {
 
-
     def populateValidParams(params) {
-		params["nombre"] = "UTN-FRD"
-		params["ubicacion"] = "San Martin 1171"
-		assert params != null
-      
+	    	 params['domicilio'] = 'valid_domicilio'
+  	 	 params['nombre'] = 'valid_nombre'
+  	 
+  
+  			 	 def localidad = Localidad.build()
+	 	 assert localidad.save() != null
+	 	 params['localidad'] = localidad
+
+	  assert params != null
+	  
     }
 
     void testIndex() {
@@ -23,41 +31,42 @@ class InstitucionControllerTests {
 
     void testList() {
 		request.method = "GET"
-		populateValidParams(params)
-		def institucion = new Institucion(params)
+		
+        def institucion = Institucion.build()
+		
 		assert institucion.save() != null
 		
 		response.format = "json"
 		
-        controller.list()
-
-        assert response.status == 200
-        assert response.json.size() == 1
-		assert response.json[0].nombre == "UTN-FRD"
+		controller.list()
+		
+		assert response.status == 200
+		assert response.json.size() == 1
     }
 
-	
-	void testSave() {
+    void testSave() {
 		request.method = "POST"
-        controller.save()
+		response.format = "json"
+        
+		controller.save()
 
         assert response.status == 500
-
-        response.reset()
-		response.format = "json"
+		response.reset()
 		
         populateValidParams(params)
-		request.setJson(params as JSON)
-        controller.save()
+			 	 params.idLocalidad = params.localidad.id
+
+        request.setJson(params as JSON)
+		
+		controller.save()
 
         assert response.status == 201
         assert response.json != null
-        assert response.json.nombre == "UTN-FRD"
     }
 
     void testShow() {
 		request.method = "GET"
-        controller.show()
+		controller.show()
 
         assert response.status == 404
         assert flash.message != null
@@ -65,20 +74,17 @@ class InstitucionControllerTests {
 		response.reset()
 		response.format = "json"
 		
-        populateValidParams(params)
-        def institucion = new Institucion(params)
-        assert institucion.save() != null
+        def institucion = Institucion.build()
+		
+		assert institucion.save() != null
 
         params.id = institucion.id
-		
-		mockDomain(Institucion, [institucion])
+
         controller.show()
 
         assert response.status == 200
 		assert response.json != null
-		assert response.json.nombre == "UTN-FRD"
     }
-
 
     void testUpdateInexistente() {
         request.method = "PUT"
@@ -86,93 +92,87 @@ class InstitucionControllerTests {
 
         assert response.status == 404
         assert flash.message != null
-
     }
 	
 	void testUpdateInvalido(){
 		request.method = "PUT"
 
-        populateValidParams(params)
-        def institucion = new Institucion(params)
-        assert institucion.save() != null
+        def institucion = Institucion.build()
+		
+		assert institucion.save() != null
 
-        // test invalid parameters in update
+        // Probar actualizar con parametros no-validos
         params.id = institucion.id
-		params.nombre = ""
+         	 	 params.localidad = '' 
+ 	 	 	 params.nombre = '' 
+ 	
+
 		request.setJson(params as JSON)
 		
-		mockDomain(Institucion, [institucion])
 		response.format = "json"
         controller.update()
 
         assert response.status == 500
         assert response.json != null
-		assert response.json.nombre == ""
-
 	}
 	
 	void testUpdateValido(){
+		request.method  = "PUT"
+		response.format = "json"
+		
+        populateValidParams(params)
+        def institucion = Institucion.build()
+		
+		assert institucion.save() != null
+		
+		params.id = institucion.id
+		
+		request.setJson(params as JSON)
+		
+		controller.update()
+
+        assert response.status == 200
+		assert response.json != null
+	}
+	
+	void testUpdateConcurrente(){
 		request.method = "PUT"
 		response.format = "json"
 		
         populateValidParams(params)
-		def institucion = new Institucion(params)
+		def institucion = Institucion.build()
+		
 		assert institucion.save() != null
 		
-		params.id = institucion.id
-		params.nombre = "UTN - FRD"
-		request.setJson(params as JSON)
-		
-		mockDomain(Institucion, [institucion])
-		
-        controller.update()
-
-        assert response.status == 200
-        assert response.json != null
-		assert response.json.nombre == "UTN - FRD"
-
-	}
-	
-	void testUpdateConcurrente(){
-        //test outdated version number
-        request.method = "PUT"
-        response.format = "json"
-		
-        populateValidParams(params)
-		def institucion = new Institucion(params)
 		institucion.version = 1
 		assert institucion.save() != null
 		
-		params.id = institucion.id
+        params.id = institucion.id
         params.version = -1
-		request.setJson(params as JSON)
+        request.setJson(params as JSON)
 		
-		mockDomain(Institucion, [institucion])
-		
-        controller.update()
+		controller.update()
 
         assert response.status == 409
         assert flash.message != null
-		
     }
 
     void testDelete() {
-		request.method = "DELETE"
-        controller.delete()
+        request.method = "DELETE"
+		controller.delete()
 		
-        assert response.status == 404
+		assert response.status == 404
         assert flash.message != null
 
         response.reset()
 
-        populateValidParams(params)
-        def institucion = new Institucion(params)
-        assert institucion.save() != null
+        def institucion = Institucion.build()
+		
+		assert institucion.save() != null
 
         params.id = institucion.id
 		request.setJson(params as JSON)
 		
-		mockDomain(Institucion, [institucion])
 		response.format = "json"
         controller.delete()
 

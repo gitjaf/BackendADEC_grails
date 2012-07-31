@@ -1,10 +1,10 @@
 
 package org.sigma.code
 
-import java.text.SimpleDateFormat;
-
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
+
+import java.text.SimpleDateFormat
 
 class NovedadController {
 
@@ -25,10 +25,15 @@ class NovedadController {
     }
     
     def save() {
-        def novedadInstance = new Novedad()
-        bindData(novedadInstance, request.JSON, ['fecha'])
-		novedadInstance.fecha = request.JSON.fecha ? new SimpleDateFormat("dd/MM/yyyy").parse(request.JSON.fecha) : null
-		novedadInstance.categoria = Categoria.get(request.JSON.idCategoria)
+        def novedadInstance = new Novedad(request.JSON)
+		
+			 bindData(novedadInstance, request.JSON, ['fecha']) 
+	 	 novedadInstance.fecha = request.JSON.fecha ? new SimpleDateFormat('yyyy-MM-dd').parse(request.JSON.fecha) : null 
+
+	 	 novedadInstance.categoria = Categoria.get(request.JSON?.idCategoria) 
+ 
+
+        
 		if (!novedadInstance.save(flush: true)) {
 			response.status = 500
 			return
@@ -36,7 +41,6 @@ class NovedadController {
 
 		flash.message = message(code: 'default.created.message', args: [message(code: 'novedad.label', default: 'Novedad'), novedadInstance.id])
         response.status = 201
-		
 		render novedadInstance as JSON
     }
 
@@ -70,9 +74,15 @@ class NovedadController {
             }
         }
 
-        bindData(novedadInstance, request.JSON, ['fecha'])
-		novedadInstance.fecha = request.JSON.fecha ? new SimpleDateFormat("dd/MM/yyyy").parse(request.JSON.fecha) : novedadInstance.fecha
+        novedadInstance.properties = request.JSON
+		
+			 bindData(novedadInstance, request.JSON, ['fecha']) 
+	 	 novedadInstance.fecha = request.JSON.fecha ? new SimpleDateFormat('yyyy-MM-dd').parse(request.JSON.fecha) : null 
 
+	 	 novedadInstance.categoria = (request.JSON?.idCategoria) ?  Categoria.get(request.JSON?.idCategoria) : novedadInstance.categoria 
+ 
+
+		
         if (!novedadInstance.save(flush: true)) {
             response.status = 500
 			render novedadInstance as JSON

@@ -4,6 +4,8 @@ package org.sigma.code
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
 
+
+
 class CampoTablaController {
 
     static allowedMethods = [show: ["GET", "POST"], save: "POST", update: "PUT", delete: "DELETE"]
@@ -25,7 +27,9 @@ class CampoTablaController {
     def save() {
         def campoTablaInstance = new CampoTabla(request.JSON)
 		
-        if (!campoTablaInstance.save(flush: true)) {
+		
+        
+		if (!campoTablaInstance.save(flush: true)) {
 			response.status = 500
 			return
         }
@@ -66,7 +70,9 @@ class CampoTablaController {
         }
 
         campoTablaInstance.properties = request.JSON
-
+		
+		
+		
         if (!campoTablaInstance.save(flush: true)) {
             response.status = 500
 			render campoTablaInstance as JSON

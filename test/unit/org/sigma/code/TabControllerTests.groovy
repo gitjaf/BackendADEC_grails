@@ -5,18 +5,18 @@ package org.sigma.code
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
+import grails.buildtestdata.mixin.Build
 
 @TestFor(TabController)
-@Mock([Tab, Usuario, CampoTabla])
+@Build(Tab)
 class TabControllerTests {
 
     def populateValidParams(params) {
-      	 params['nombre'] = 'valid_nombre'
-		 def usuario = new Usuario(id: 1, nombre: 'unNombre', apellido: 'unApellido', username: 'unUsername', password: 'unPass', email: 'unEmail')
-		 mockDomain(Usuario, [usuario])
-		 params['idUsuario'] = 1
-
-		 assert params != null
+	    	 params['nombre'] = 'valid_nombre'
+  	 
+  
+  		
+	  assert params != null
 	  
     }
 
@@ -27,9 +27,9 @@ class TabControllerTests {
 
     void testList() {
 		request.method = "GET"
-		populateValidParams(params)
 		
-        def tab = new Tab(params)
+        def tab = Tab.build()
+		
 		assert tab.save() != null
 		
 		response.format = "json"
@@ -42,15 +42,17 @@ class TabControllerTests {
 
     void testSave() {
 		request.method = "POST"
-        controller.save()
+		response.format = "json"
+        
+		controller.save()
 
         assert response.status == 500
-		
-        response.reset()
-		response.format = "json"
+		response.reset()
 		
         populateValidParams(params)
+		
         request.setJson(params as JSON)
+		
 		controller.save()
 
         assert response.status == 201
@@ -67,13 +69,12 @@ class TabControllerTests {
 		response.reset()
 		response.format = "json"
 		
-        populateValidParams(params)
-        def tab = new Tab(params)
-        assert tab.save() != null
+        def tab = Tab.build()
+		
+		assert tab.save() != null
 
         params.id = tab.id
 
-		mockDomain(Tab, [tab])
         controller.show()
 
         assert response.status == 200
@@ -91,19 +92,17 @@ class TabControllerTests {
 	void testUpdateInvalido(){
 		request.method = "PUT"
 
-        populateValidParams(params)
-        def tab = new Tab(params)
-        assert tab.save() != null
+        def tab = Tab.build()
+		
+		assert tab.save() != null
 
-        // test invalid parameters in update
+        // Probar actualizar con parametros no-validos
         params.id = tab.id
-         	 params.nombre = '' 
- 	 	 params.usuario = '' 
+         	 	 params.nombre = '' 
  	
 
 		request.setJson(params as JSON)
 		
-		mockDomain(Tab, [tab])
 		response.format = "json"
         controller.update()
 
@@ -116,14 +115,13 @@ class TabControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def tab = new Tab(params)
+        def tab = Tab.build()
+		
 		assert tab.save() != null
 		
 		params.id = tab.id
 		
 		request.setJson(params as JSON)
-		
-		mockDomain(Tab, [tab])
 		
 		controller.update()
 
@@ -136,15 +134,16 @@ class TabControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def tab = new Tab(params)
+		def tab = Tab.build()
+		
+		assert tab.save() != null
+		
 		tab.version = 1
 		assert tab.save() != null
 		
         params.id = tab.id
         params.version = -1
         request.setJson(params as JSON)
-		
-		mockDomain(Tab, [tab])
 		
 		controller.update()
 
@@ -161,14 +160,13 @@ class TabControllerTests {
 
         response.reset()
 
-        populateValidParams(params)
-        def tab = new Tab(params)
-        assert tab.save() != null
+        def tab = Tab.build()
+		
+		assert tab.save() != null
 
         params.id = tab.id
 		request.setJson(params as JSON)
 		
-		mockDomain(Tab, [tab])
 		response.format = "json"
         controller.delete()
 

@@ -4,6 +4,8 @@ package org.sigma.code
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
 
+
+
 class CursoController {
 
     static allowedMethods = [show: ["GET", "POST"], save: "POST", update: "PUT", delete: "DELETE"]
@@ -24,7 +26,10 @@ class CursoController {
     
     def save() {
         def cursoInstance = new Curso(request.JSON)
-        if (!cursoInstance.save(flush: true)) {
+		
+		
+        
+		if (!cursoInstance.save(flush: true)) {
 			response.status = 500
 			return
         }
@@ -65,7 +70,9 @@ class CursoController {
         }
 
         cursoInstance.properties = request.JSON
-
+		
+		
+		
         if (!cursoInstance.save(flush: true)) {
             response.status = 500
 			render cursoInstance as JSON

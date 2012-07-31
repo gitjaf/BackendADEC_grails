@@ -4,6 +4,8 @@ package org.sigma.code
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
 
+
+
 class MenuController {
 
     static allowedMethods = [show: ["GET", "POST"], save: "POST", update: "PUT", delete: "DELETE"]
@@ -24,7 +26,10 @@ class MenuController {
     
     def save() {
         def menuInstance = new Menu(request.JSON)
-        if (!menuInstance.save(flush: true)) {
+		
+		
+        
+		if (!menuInstance.save(flush: true)) {
 			response.status = 500
 			return
         }
@@ -65,12 +70,14 @@ class MenuController {
         }
 
         menuInstance.properties = request.JSON
-
+		
+		
+		
         if (!menuInstance.save(flush: true)) {
             response.status = 500
 			render menuInstance as JSON
             return
-        } 
+        }
 
 		flash.message = message(code: 'default.updated.message', args: [message(code: 'menu.label', default: 'Menu'), menuInstance.id])
 		response.status = 200

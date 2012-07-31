@@ -2,25 +2,27 @@ package org.sigma.code
 
 
 
-import java.text.SimpleDateFormat;
-
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
+import grails.buildtestdata.mixin.Build
 
 @TestFor(NovedadController)
-@Mock([Novedad, Categoria])
+@Build(Novedad)
 class NovedadControllerTests {
 
     def populateValidParams(params) {
-      	 params['cuerpo'] = 'valid_cuerpo'
+	    	 params['cuerpo'] = 'valid_cuerpo'
+  	 	 params['fecha'] = '2012-10-20' 
   		 params['leido'] = true 
   		 params['titulo'] = 'valid_titulo'
-		 def categoria = new Categoria(id: 1, img: "imagen", evento: "evento", nombre: "nombre")
-		 assert categoria.save() != null
-		 params['categoria'] = categoria
-		 params['fecha'] = "20/01/2012"
-  		 assert params != null
+  	 
+  
+  			 	 def categoria = Categoria.build()
+	 	 assert categoria.save() != null
+	 	 params['categoria'] = categoria
+
+	  assert params != null
 	  
     }
 
@@ -31,15 +33,8 @@ class NovedadControllerTests {
 
     void testList() {
 		request.method = "GET"
-		populateValidParams(params)
-        
-		def novedad = new Novedad(params)
-		novedad.fecha = new SimpleDateFormat("dd/MM/yyyy").parse(params.fecha)
 		
-		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
-		* la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
-		*/
-		novedad.clearErrors()
+        def novedad = Novedad.build()
 		
 		assert novedad.save() != null
 		
@@ -54,16 +49,17 @@ class NovedadControllerTests {
     void testSave() {
 		request.method = "POST"
 		response.format = "json"
-        controller.save()
+        
+		controller.save()
 
         assert response.status == 500
-        response.reset()
+		response.reset()
 		
         populateValidParams(params)
-		mockDomain(Categoria, [params.categoria])
-		params.idCategoria = params.categoria.id
-        request.setJson(params as JSON)
+			 	 params.idCategoria = params.categoria.id
 
+        request.setJson(params as JSON)
+		
 		controller.save()
 
         assert response.status == 201
@@ -80,19 +76,12 @@ class NovedadControllerTests {
 		response.reset()
 		response.format = "json"
 		
-        populateValidParams(params)
-        def novedad = new Novedad(params)
-		novedad.fecha = new SimpleDateFormat("dd/MM/yyyy").parse(params.fecha)
+        def novedad = Novedad.build()
 		
-		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
-		* la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
-		*/
-		novedad.clearErrors()
 		assert novedad.save() != null
 
         params.id = novedad.id
 
-		mockDomain(Novedad, [novedad])
         controller.show()
 
         assert response.status == 200
@@ -109,29 +98,22 @@ class NovedadControllerTests {
 	
 	void testUpdateInvalido(){
 		request.method = "PUT"
-        
-		populateValidParams(params)
-		def novedad = new Novedad(params)
-		novedad.fecha = new SimpleDateFormat("dd/MM/yyyy").parse(params.fecha)
-		
-		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
-		 * la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
-		 */
-		novedad.clearErrors()
-        assert novedad.save() != null
 
-        // test invalid parameters in update
-         params.id = novedad.id
-         params.categoria = "" 
- 	 	 params.cuerpo = "" 
- 	 	 params.fecha = "" 
- 	 	 params.leido = "" 
- 	 	 params.titulo = "" 
+        def novedad = Novedad.build()
+		
+		assert novedad.save() != null
+
+        // Probar actualizar con parametros no-validos
+        params.id = novedad.id
+         	 	 params.categoria = '' 
+ 	 	 	 params.cuerpo = '' 
+ 	 	 	 params.fecha = '' 
+ 	 	 	 params.leido = '' 
+ 	 	 	 params.titulo = '' 
  	
 
 		request.setJson(params as JSON)
 		
-		mockDomain(Novedad, [novedad])
 		response.format = "json"
         controller.update()
 
@@ -144,20 +126,13 @@ class NovedadControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def novedad = new Novedad(params)
-		novedad.fecha = new SimpleDateFormat("dd/MM/yyyy").parse(params.fecha)
+        def novedad = Novedad.build()
 		
-		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
-		 * la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
-		 */
-		novedad.clearErrors()
 		assert novedad.save() != null
 		
 		params.id = novedad.id
 		
 		request.setJson(params as JSON)
-		
-		mockDomain(Novedad, [novedad])
 		
 		controller.update()
 
@@ -170,20 +145,16 @@ class NovedadControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def novedad = new Novedad(params)
-		novedad.fecha = new SimpleDateFormat("dd/MM/yyyy").parse(params.fecha)
-		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
-		 * la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
-		 */
-		novedad.clearErrors()
+		def novedad = Novedad.build()
+		
+		assert novedad.save() != null
+		
 		novedad.version = 1
 		assert novedad.save() != null
 		
         params.id = novedad.id
         params.version = -1
         request.setJson(params as JSON)
-		
-		mockDomain(Novedad, [novedad])
 		
 		controller.update()
 
@@ -200,20 +171,13 @@ class NovedadControllerTests {
 
         response.reset()
 
-        populateValidParams(params)
-        def novedad = new Novedad(params)
-		novedad.fecha = new SimpleDateFormat("dd/MM/yyyy").parse(params.fecha)
+        def novedad = Novedad.build()
 		
-		/* Es necesario hacer un clearErrors() porque al bindear params con novedad se produce un error de tipos entre
-		 * la fecha de tipo String que viene en el mapa params, y el atributo de tipo Date de la instancia novedad
-		 */
-		novedad.clearErrors()
-        assert novedad.save() != null
+		assert novedad.save() != null
 
         params.id = novedad.id
 		request.setJson(params as JSON)
 		
-		mockDomain(Novedad, [novedad])
 		response.format = "json"
         controller.delete()
 

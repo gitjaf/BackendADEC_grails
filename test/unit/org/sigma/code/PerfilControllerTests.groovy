@@ -2,20 +2,22 @@ package org.sigma.code
 
 
 
-import org.apache.jasper.compiler.Node.ParamsAction;
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
+import grails.buildtestdata.mixin.Build
 
 @TestFor(PerfilController)
-@Mock(Perfil)
+@Build(Perfil)
 class PerfilControllerTests {
 
-
     def populateValidParams(params) {
-		params["descripcion"] = "ADEC"
-		assert params != null
-      
+	    	 params['descripcion'] = 'valid_descripcion'
+  	 
+  
+  		
+	  assert params != null
+	  
     }
 
     void testIndex() {
@@ -25,41 +27,41 @@ class PerfilControllerTests {
 
     void testList() {
 		request.method = "GET"
-		populateValidParams(params)
-		def perfil = new Perfil(params)
+		
+        def perfil = Perfil.build()
+		
 		assert perfil.save() != null
 		
 		response.format = "json"
 		
-        controller.list()
+		controller.list()
 		
 		assert response.status == 200
-        assert response.json.size() == 1
-        assert response.json[0].descripcion == "ADEC"
+		assert response.json.size() == 1
     }
 
     void testSave() {
 		request.method = "POST"
-        controller.save()
+		response.format = "json"
+        
+		controller.save()
 
         assert response.status == 500
-
-        response.reset()
-		response.format = "json"
+		response.reset()
 		
         populateValidParams(params)
-		request.setJson(params as JSON)
-        controller.save()
+		
+        request.setJson(params as JSON)
+		
+		controller.save()
 
         assert response.status == 201
-        assert controller.flash.message != null
-        assert Perfil.count() == 1
-		assert response.json.descripcion == "ADEC"
+        assert response.json != null
     }
 
     void testShow() {
 		request.method = "GET"
-        controller.show()
+		controller.show()
 
         assert response.status == 404
         assert flash.message != null
@@ -67,119 +69,110 @@ class PerfilControllerTests {
 		response.reset()
 		response.format = "json"
 		
-        populateValidParams(params)
-        def perfil = new Perfil(params)
-        assert perfil.save() != null
+        def perfil = Perfil.build()
 		
+		assert perfil.save() != null
+
         params.id = perfil.id
 
-		mockDomain(Perfil, [perfil])
         controller.show()
 
-		assert response.status == 200
-        assert response.json != null
-		assert response.json.descripcion == "ADEC"
+        assert response.status == 200
+		assert response.json != null
     }
 
     void testUpdateInexistente() {
-		request.method = "PUT"
-		
-        controller.update()
+        request.method = "PUT"
+		controller.update()
 
         assert response.status == 404
         assert flash.message != null
-
     }
-
+	
 	void testUpdateInvalido(){
 		request.method = "PUT"
-		
-        populateValidParams(params)
-        def perfil = new Perfil(params)
-        assert perfil.save() != null
 
-        // test invalid parameters in update
+        def perfil = Perfil.build()
+		
+		assert perfil.save() != null
+
+        // Probar actualizar con parametros no-validos
         params.id = perfil.id
-		params.descripcion = ""
+         	 	 params.descripcion = '' 
+ 	
+
 		request.setJson(params as JSON)
 		
-		mockDomain(Perfil, [perfil])
-		
+		response.format = "json"
         controller.update()
 
         assert response.status == 500
-		assert response.json != null
-        assert response.json.descripcion == ""
-
+        assert response.json != null
 	}
 	
 	void testUpdateValido(){
-		request.method = "PUT"
+		request.method  = "PUT"
 		response.format = "json"
 		
         populateValidParams(params)
-		def perfil = new Perfil(params)
+        def perfil = Perfil.build()
+		
 		assert perfil.save() != null
 		
 		params.id = perfil.id
-		params.descripcion = "ADEC2"
+		
 		request.setJson(params as JSON)
 		
-		mockDomain(Perfil, [perfil])
-		
-        controller.update()
+		controller.update()
 
         assert response.status == 200
-        assert response.json != null
-		assert response.json.descripcion == "ADEC2"
-		
+		assert response.json != null
 	}
 	
 	void testUpdateConcurrente(){
-		//test outdated version number
 		request.method = "PUT"
 		response.format = "json"
 		
         populateValidParams(params)
-		def perfil = new Perfil(params)
+		def perfil = Perfil.build()
+		
+		assert perfil.save() != null
+		
 		perfil.version = 1
 		assert perfil.save() != null
 		
         params.id = perfil.id
         params.version = -1
-		request.setJson(params as JSON)
+        request.setJson(params as JSON)
 		
-		mockDomain(Perfil, [perfil])
-		
-        controller.update()
+		controller.update()
 
-		assert response.status == 409
-		assert flash.message != null
+        assert response.status == 409
+        assert flash.message != null
     }
 
     void testDelete() {
-		request.method = "DELETE"
-        controller.delete()
-        assert response.status == 404
+        request.method = "DELETE"
+		controller.delete()
+		
+		assert response.status == 404
         assert flash.message != null
 
         response.reset()
 
-        populateValidParams(params)
-        def perfil = new Perfil(params)
-        assert perfil.save() != null
-        assert Perfil.count() == 1
+        def perfil = Perfil.build()
+		
+		assert perfil.save() != null
 
         params.id = perfil.id
-
-		mockDomain(Perfil, [perfil])
+		request.setJson(params as JSON)
 		
+		response.format = "json"
         controller.delete()
 
         assert Perfil.count() == 0
         assert Perfil.get(perfil.id) == null
         assert response.status == 200
 		assert flash.message != null
-		
     }
 }

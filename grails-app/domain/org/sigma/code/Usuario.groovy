@@ -8,10 +8,11 @@ class Usuario {
 	String username
 	String password
 	String empresa
-	String localidad
 	String direccion
 	String telefono
 	String email
+	
+	Localidad localidad
 	
 	static belongsTo = [perfil: Perfil]
 	
@@ -23,7 +24,6 @@ class Usuario {
 		username(required: true, blank: false)
 		password(required: true, blank: false)
 		email(required: true)
-		localidad(nullable: true)
 		direccion(nullable: true)
 		telefono(nullable: true)
 		empresa(nullable: true)

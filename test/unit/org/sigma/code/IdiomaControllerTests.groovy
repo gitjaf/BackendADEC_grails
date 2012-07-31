@@ -7,43 +7,30 @@ import grails.test.mixin.*
 import grails.converters.JSON
 import grails.buildtestdata.mixin.Build
 
-@TestFor(UsuarioController)
-@Build(Usuario)
-class UsuarioControllerTests {
+@TestFor(IdiomaController)
+@Build(Idioma)
+class IdiomaControllerTests {
 
     def populateValidParams(params) {
-	    	 params['apellido'] = 'valid_apellido'
-  	 	 params['direccion'] = 'valid_direccion'
-  	 	 params['email'] = 'valid_email'
-  	 	 params['empresa'] = 'valid_empresa'
-  	 	 params['nombre'] = 'valid_nombre'
-  	 	 params['password'] = 'valid_password'
-  	 	 params['telefono'] = 'valid_telefono'
-  	 	 params['username'] = 'valid_username'
+	    	 params['idioma'] = 'valid_idioma'
   	 
   
-  			 	 def localidad = Localidad.build()
-	 	 assert localidad.save() != null
-	 	 params['localidad'] = localidad
-	 	 def perfil = Perfil.build()
-	 	 assert perfil.save() != null
-	 	 params['perfil'] = perfil
-
+  		
 	  assert params != null
 	  
     }
 
     void testIndex() {
         controller.index()
-        assert "/usuario/list" == response.redirectedUrl
+        assert "/idioma/list" == response.redirectedUrl
     }
 
     void testList() {
 		request.method = "GET"
 		
-        def usuario = Usuario.build()
+        def idioma = Idioma.build()
 		
-		assert usuario.save() != null
+		assert idioma.save() != null
 		
 		response.format = "json"
 		
@@ -63,9 +50,7 @@ class UsuarioControllerTests {
 		response.reset()
 		
         populateValidParams(params)
-			 	 params.idLocalidad = params.localidad.id
-	 	 params.idPerfil = params.perfil.id
-
+		
         request.setJson(params as JSON)
 		
 		controller.save()
@@ -84,11 +69,11 @@ class UsuarioControllerTests {
 		response.reset()
 		response.format = "json"
 		
-        def usuario = Usuario.build()
+        def idioma = Idioma.build()
 		
-		assert usuario.save() != null
+		assert idioma.save() != null
 
-        params.id = usuario.id
+        params.id = idioma.id
 
         controller.show()
 
@@ -107,19 +92,13 @@ class UsuarioControllerTests {
 	void testUpdateInvalido(){
 		request.method = "PUT"
 
-        def usuario = Usuario.build()
+        def idioma = Idioma.build()
 		
-		assert usuario.save() != null
+		assert idioma.save() != null
 
         // Probar actualizar con parametros no-validos
-        params.id = usuario.id
-         	 	 params.apellido = '' 
- 	 	 	 params.email = '' 
- 	 	 	 params.localidad = '' 
- 	 	 	 params.nombre = '' 
- 	 	 	 params.password = '' 
- 	 	 	 params.perfil = '' 
- 	 	 	 params.username = '' 
+        params.id = idioma.id
+         	 	 params.idioma = '' 
  	
 
 		request.setJson(params as JSON)
@@ -136,11 +115,11 @@ class UsuarioControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def usuario = Usuario.build()
+        def idioma = Idioma.build()
 		
-		assert usuario.save() != null
+		assert idioma.save() != null
 		
-		params.id = usuario.id
+		params.id = idioma.id
 		
 		request.setJson(params as JSON)
 		
@@ -155,14 +134,14 @@ class UsuarioControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def usuario = Usuario.build()
+		def idioma = Idioma.build()
 		
-		assert usuario.save() != null
+		assert idioma.save() != null
 		
-		usuario.version = 1
-		assert usuario.save() != null
+		idioma.version = 1
+		assert idioma.save() != null
 		
-        params.id = usuario.id
+        params.id = idioma.id
         params.version = -1
         request.setJson(params as JSON)
 		
@@ -181,18 +160,18 @@ class UsuarioControllerTests {
 
         response.reset()
 
-        def usuario = Usuario.build()
+        def idioma = Idioma.build()
 		
-		assert usuario.save() != null
+		assert idioma.save() != null
 
-        params.id = usuario.id
+        params.id = idioma.id
 		request.setJson(params as JSON)
 		
 		response.format = "json"
         controller.delete()
 
-        assert Usuario.count() == 0
-        assert Usuario.get(usuario.id) == null
+        assert Idioma.count() == 0
+        assert Idioma.get(idioma.id) == null
         assert response.status == 200
 		assert flash.message != null
     }

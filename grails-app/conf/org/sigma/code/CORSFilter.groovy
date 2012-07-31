@@ -9,14 +9,12 @@ import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletResponse
 
 
-// FILTRO ESTATICO
-class CORSFilters implements Filter {
+class CORSFilter implements Filter {
 	public void init(FilterConfig fConfig) throws ServletException { }
 
 	public void destroy() { }
 
-	public void doFilter(
-			ServletRequest request, ServletResponse response,
+	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 
 		response.addHeader('Access-Control-Allow-Origin', "*")
@@ -29,25 +27,3 @@ class CORSFilters implements Filter {
 	}
 }
 
-// FILTRO DINAMICO
-//class CORSFilters {
-//
-//    def filters = {
-//        all(controller:'*', action:'*' ) {
-//            before = {
-//				response.addHeader('Access-Control-Allow-Methods', 'POST, PUT, DELETE, OPTIONS, PATCH')
-//				response.addHeader('Access-Control-Allow-Origin', '*')
-//				response.addHeader('Access-Control-Allow-Headers', '*')
-//				response.addHeader('Access-Control-Allow-Credentials', 'true')
-//				response.addHeader('Access-Control-Max-Age', '1728000')
-//				
-//            }
-//            after = { Map model ->
-//
-//            }
-//            afterView = { Exception e ->
-//
-//            }
-//        }
-//    }
-//}

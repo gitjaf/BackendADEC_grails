@@ -3,6 +3,7 @@ package org.sigma.code
 
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
+
 import java.text.SimpleDateFormat
 
 class HistorialController {
@@ -24,10 +25,15 @@ class HistorialController {
     }
     
     def save() {
-        def historialInstance = new Historial()
-		bindData(historialInstance, request.JSON, ["fecha"])
-		historialInstance.fecha = request.JSON.fecha ? new SimpleDateFormat("dd/MM/yyyy").parse(request.JSON.fecha) : null
-		historialInstance.usuario = Usuario.get(request.JSON.idUsuario)
+        def historialInstance = new Historial(request.JSON)
+		
+			 bindData(historialInstance, request.JSON, ['fecha']) 
+	 	 historialInstance.fecha = request.JSON.fecha ? new SimpleDateFormat('yyyy-MM-dd').parse(request.JSON.fecha) : null 
+
+	 	 historialInstance.usuario = Usuario.get(request.JSON?.idUsuario) 
+ 
+
+        
 		if (!historialInstance.save(flush: true)) {
 			response.status = 500
 			return
@@ -68,9 +74,15 @@ class HistorialController {
             }
         }
 
-        bindData(historialInstance, request.JSON, ["fecha"])
-		historialInstance.fecha = request.JSON.fecha ? new SimpleDateFormat("dd/MM/yyyy").parse(request.JSON.fecha) : null
+        historialInstance.properties = request.JSON
+		
+			 bindData(historialInstance, request.JSON, ['fecha']) 
+	 	 historialInstance.fecha = request.JSON.fecha ? new SimpleDateFormat('yyyy-MM-dd').parse(request.JSON.fecha) : null 
 
+	 	 historialInstance.usuario = (request.JSON?.idUsuario) ?  Usuario.get(request.JSON?.idUsuario) : historialInstance.usuario 
+ 
+
+		
         if (!historialInstance.save(flush: true)) {
             response.status = 500
 			render historialInstance as JSON

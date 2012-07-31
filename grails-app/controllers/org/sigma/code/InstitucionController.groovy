@@ -1,7 +1,10 @@
+
 package org.sigma.code
 
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
+
+
 
 class InstitucionController {
 
@@ -13,27 +16,30 @@ class InstitucionController {
 
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        
-		def instituciones = Institucion.list()
+		
+		def institucionInstanceList = Institucion.list()
 		
 		response.status = 200
 		
-		render instituciones as JSON
+		render institucionInstanceList as JSON
     }
-
+    
     def save() {
         def institucionInstance = new Institucion(request.JSON)
-		request.JSON.idCursos.each {id -> institucionInstance.cursos.add(Curso.get(id))}
 		
-        if (!institucionInstance.save(flush: true)) {
-            response.status = 500
+			 	 institucionInstance.localidad = Localidad.get(request.JSON?.idLocalidad) 
+ 
+
+        
+		if (!institucionInstance.save(flush: true)) {
+			response.status = 500
 			return
         }
 
 		flash.message = message(code: 'default.created.message', args: [message(code: 'institucion.label', default: 'Institucion'), institucionInstance.id])
-		response.status = 201
+        response.status = 201
 		render institucionInstance as JSON
-	}
+    }
 
     def show() {
         def institucionInstance = Institucion.get(params.id)
@@ -43,10 +49,10 @@ class InstitucionController {
 			render flash.message
             return
         }
-		response.status == 200
-		render institucionInstance as JSON
+		response.status = 200
+        render institucionInstance as JSON
     }
-   
+
     def update() {
         def institucionInstance = Institucion.get(params.id)
         if (!institucionInstance) {
@@ -66,12 +72,11 @@ class InstitucionController {
         }
 
         institucionInstance.properties = request.JSON
-        
-		if(request.JSON?.idCursos || request.JSON?.idCursos?.isEmpty()){
-			institucionInstance.cursos?.clear()
-			request.JSON.idCursos.each {id -> institucionInstance.cursos.add(Curso.get(id))}
-		}
+		
+			 	 institucionInstance.localidad = (request.JSON?.idLocalidad) ?  Localidad.get(request.JSON?.idLocalidad) : institucionInstance.localidad 
+ 
 
+		
         if (!institucionInstance.save(flush: true)) {
             response.status = 500
 			render institucionInstance as JSON
@@ -80,7 +85,7 @@ class InstitucionController {
 
 		flash.message = message(code: 'default.updated.message', args: [message(code: 'institucion.label', default: 'Institucion'), institucionInstance.id])
 		response.status = 200
-		render institucionInstance as JSON
+        render institucionInstance as JSON
     }
 
     def delete() {
@@ -100,7 +105,7 @@ class InstitucionController {
         }
         catch (DataIntegrityViolationException e) {
 			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'institucion.label', default: 'Institucion'), params.id])
-			response.status = 500
+            response.status = 500
 			render flash.message
         }
     }

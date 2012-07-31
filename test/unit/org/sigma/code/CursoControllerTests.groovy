@@ -5,15 +5,18 @@ package org.sigma.code
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
+import grails.buildtestdata.mixin.Build
 
 @TestFor(CursoController)
-@Mock([Institucion, Curso])
+@Build(Curso)
 class CursoControllerTests {
 
     def populateValidParams(params) {
-      	 params['codigo'] = 'valid_codigo'
+	    	 params['codigo'] = 'valid_codigo'
   	 	 params['curso'] = 'valid_curso'
   	 
+  
+  		
 	  assert params != null
 	  
     }
@@ -25,9 +28,9 @@ class CursoControllerTests {
 
     void testList() {
 		request.method = "GET"
-		populateValidParams(params)
 		
-        def curso = new Curso(params)
+        def curso = Curso.build()
+		
 		assert curso.save() != null
 		
 		response.format = "json"
@@ -40,15 +43,17 @@ class CursoControllerTests {
 
     void testSave() {
 		request.method = "POST"
-        controller.save()
+		response.format = "json"
+        
+		controller.save()
 
         assert response.status == 500
-		
-        response.reset()
-		response.format = "json"
+		response.reset()
 		
         populateValidParams(params)
+		
         request.setJson(params as JSON)
+		
 		controller.save()
 
         assert response.status == 201
@@ -65,13 +70,12 @@ class CursoControllerTests {
 		response.reset()
 		response.format = "json"
 		
-        populateValidParams(params)
-        def curso = new Curso(params)
-        assert curso.save() != null
+        def curso = Curso.build()
+		
+		assert curso.save() != null
 
         params.id = curso.id
 
-		mockDomain(Curso, [curso])
         controller.show()
 
         assert response.status == 200
@@ -89,19 +93,18 @@ class CursoControllerTests {
 	void testUpdateInvalido(){
 		request.method = "PUT"
 
-        populateValidParams(params)
-        def curso = new Curso(params)
-        assert curso.save() != null
+        def curso = Curso.build()
+		
+		assert curso.save() != null
 
-        // test invalid parameters in update
+        // Probar actualizar con parametros no-validos
         params.id = curso.id
-         	 params.codigo = '' 
- 	 	 params.curso = '' 
+         	 	 params.codigo = '' 
+ 	 	 	 params.curso = '' 
  	
 
 		request.setJson(params as JSON)
 		
-		mockDomain(Curso, [curso])
 		response.format = "json"
         controller.update()
 
@@ -114,14 +117,13 @@ class CursoControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def curso = new Curso(params)
+        def curso = Curso.build()
+		
 		assert curso.save() != null
 		
 		params.id = curso.id
 		
 		request.setJson(params as JSON)
-		
-		mockDomain(Curso, [curso])
 		
 		controller.update()
 
@@ -134,15 +136,16 @@ class CursoControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def curso = new Curso(params)
+		def curso = Curso.build()
+		
+		assert curso.save() != null
+		
 		curso.version = 1
 		assert curso.save() != null
 		
         params.id = curso.id
         params.version = -1
         request.setJson(params as JSON)
-		
-		mockDomain(Curso, [curso])
 		
 		controller.update()
 
@@ -159,14 +162,13 @@ class CursoControllerTests {
 
         response.reset()
 
-        populateValidParams(params)
-        def curso = new Curso(params)
-        assert curso.save() != null
+        def curso = Curso.build()
+		
+		assert curso.save() != null
 
         params.id = curso.id
 		request.setJson(params as JSON)
 		
-		mockDomain(Curso, [curso])
 		response.format = "json"
         controller.delete()
 

@@ -12,8 +12,7 @@ class BootStrap {
 		
 		if (!isProd){
 			fixtureLoader.load('usuarioFixtures')
-			fixtureLoader.load('institucionFixtures')   // Ommit the .groovy extension!
-			fixtureLoader.load('localidadFixtures')
+			fixtureLoader.load('candidatoFixtures')   // Ommit the .groovy extension!
 			assert Usuario.count == 10
 			assert Perfil.count == 9
 			assert Novedad.count == 5
@@ -22,7 +21,7 @@ class BootStrap {
 			assert Menu.count == 5
 			assert Historial.count == 5
 			assert Institucion.count == 5
-			assert Localidad.count == 5
+			assert Localidad.count == 20
 			assert CampoTabla.count == 5
 			assert Curso.count == 5
 			assert Tab.count == 5

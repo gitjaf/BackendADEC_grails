@@ -4,6 +4,8 @@ package org.sigma.code
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
 
+
+
 class LocalidadController {
 
     static allowedMethods = [show: ["GET", "POST"], save: "POST", update: "PUT", delete: "DELETE"]
@@ -24,7 +26,10 @@ class LocalidadController {
     
     def save() {
         def localidadInstance = new Localidad(request.JSON)
-        if (!localidadInstance.save(flush: true)) {
+		
+		
+        
+		if (!localidadInstance.save(flush: true)) {
 			response.status = 500
 			return
         }
@@ -65,7 +70,9 @@ class LocalidadController {
         }
 
         localidadInstance.properties = request.JSON
-
+		
+		
+		
         if (!localidadInstance.save(flush: true)) {
             response.status = 500
 			render localidadInstance as JSON

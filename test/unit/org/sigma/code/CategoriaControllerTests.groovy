@@ -5,17 +5,21 @@ package org.sigma.code
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
+import grails.buildtestdata.mixin.Build
 
 @TestFor(CategoriaController)
-@Mock(Categoria)
+@Build(Categoria)
 class CategoriaControllerTests {
 
     def populateValidParams(params) {
-      assert params != null
-      // TODO: Populate valid properties like...
-      params["img"] = 'unImg'
-	  params["evento"] = 'unEvento'
-	  params["nombre"] = 'unNombre'
+	    	 params['evento'] = 'valid_evento'
+  	 	 params['img'] = 'valid_img'
+  	 	 params['nombre'] = 'valid_nombre'
+  	 
+  
+  		
+	  assert params != null
+	  
     }
 
     void testIndex() {
@@ -25,10 +29,10 @@ class CategoriaControllerTests {
 
     void testList() {
 		request.method = "GET"
-		populateValidParams(params)
 		
-        def novedad_Sidebar = new Categoria(params)
-		assert novedad_Sidebar.save() != null
+        def categoria = Categoria.build()
+		
+		assert categoria.save() != null
 		
 		response.format = "json"
 		
@@ -40,15 +44,17 @@ class CategoriaControllerTests {
 
     void testSave() {
 		request.method = "POST"
-        controller.save()
+		response.format = "json"
+        
+		controller.save()
 
         assert response.status == 500
-		
-        response.reset()
-		response.format = "json"
+		response.reset()
 		
         populateValidParams(params)
+		
         request.setJson(params as JSON)
+		
 		controller.save()
 
         assert response.status == 201
@@ -65,13 +71,12 @@ class CategoriaControllerTests {
 		response.reset()
 		response.format = "json"
 		
-        populateValidParams(params)
-        def novedad_Sidebar = new Categoria(params)
-        assert novedad_Sidebar.save() != null
+        def categoria = Categoria.build()
+		
+		assert categoria.save() != null
 
-        params.id = novedad_Sidebar.id
+        params.id = categoria.id
 
-		mockDomain(Categoria, [novedad_Sidebar])
         controller.show()
 
         assert response.status == 200
@@ -89,17 +94,19 @@ class CategoriaControllerTests {
 	void testUpdateInvalido(){
 		request.method = "PUT"
 
-        populateValidParams(params)
-        def novedad_Sidebar = new Categoria(params)
-        assert novedad_Sidebar.save() != null
+        def categoria = Categoria.build()
+		
+		assert categoria.save() != null
 
-        // test invalid parameters in update
-        params.id = novedad_Sidebar.id
-        params.nombre = ""
+        // Probar actualizar con parametros no-validos
+        params.id = categoria.id
+         	 	 params.evento = '' 
+ 	 	 	 params.img = '' 
+ 	 	 	 params.nombre = '' 
+ 	
 
 		request.setJson(params as JSON)
 		
-		mockDomain(Categoria, [novedad_Sidebar])
 		response.format = "json"
         controller.update()
 
@@ -112,14 +119,13 @@ class CategoriaControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def novedad_Sidebar = new Categoria(params)
-		assert novedad_Sidebar.save() != null
+        def categoria = Categoria.build()
 		
-		params.id = novedad_Sidebar.id
+		assert categoria.save() != null
+		
+		params.id = categoria.id
 		
 		request.setJson(params as JSON)
-		
-		mockDomain(Categoria, [novedad_Sidebar])
 		
 		controller.update()
 
@@ -132,15 +138,16 @@ class CategoriaControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def novedad_Sidebar = new Categoria(params)
-		novedad_Sidebar.version = 1
-		assert novedad_Sidebar.save() != null
+		def categoria = Categoria.build()
 		
-        params.id = novedad_Sidebar.id
+		assert categoria.save() != null
+		
+		categoria.version = 1
+		assert categoria.save() != null
+		
+        params.id = categoria.id
         params.version = -1
         request.setJson(params as JSON)
-		
-		mockDomain(Categoria, [novedad_Sidebar])
 		
 		controller.update()
 
@@ -157,19 +164,18 @@ class CategoriaControllerTests {
 
         response.reset()
 
-        populateValidParams(params)
-        def novedad_Sidebar = new Categoria(params)
-        assert novedad_Sidebar.save() != null
+        def categoria = Categoria.build()
+		
+		assert categoria.save() != null
 
-        params.id = novedad_Sidebar.id
+        params.id = categoria.id
 		request.setJson(params as JSON)
 		
-		mockDomain(Categoria, [novedad_Sidebar])
 		response.format = "json"
         controller.delete()
 
         assert Categoria.count() == 0
-        assert Categoria.get(novedad_Sidebar.id) == null
+        assert Categoria.get(categoria.id) == null
         assert response.status == 200
 		assert flash.message != null
     }

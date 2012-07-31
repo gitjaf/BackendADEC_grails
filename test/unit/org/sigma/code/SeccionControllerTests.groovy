@@ -5,16 +5,19 @@ package org.sigma.code
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
+import grails.buildtestdata.mixin.Build
 
 @TestFor(SeccionController)
-@Mock(Seccion)
+@Build(Seccion)
 class SeccionControllerTests {
 
     def populateValidParams(params) {
-      	 params['evento'] = 'valid_evento'
+	    	 params['evento'] = 'valid_evento'
   	 	 params['img'] = 'valid_img'
   	 	 params['nombre'] = 'valid_nombre'
   	 
+  
+  		
 	  assert params != null
 	  
     }
@@ -26,9 +29,9 @@ class SeccionControllerTests {
 
     void testList() {
 		request.method = "GET"
-		populateValidParams(params)
 		
-        def seccion = new Seccion(params)
+        def seccion = Seccion.build()
+		
 		assert seccion.save() != null
 		
 		response.format = "json"
@@ -41,15 +44,17 @@ class SeccionControllerTests {
 
     void testSave() {
 		request.method = "POST"
-        controller.save()
+		response.format = "json"
+        
+		controller.save()
 
         assert response.status == 500
-		
-        response.reset()
-		response.format = "json"
+		response.reset()
 		
         populateValidParams(params)
+		
         request.setJson(params as JSON)
+		
 		controller.save()
 
         assert response.status == 201
@@ -66,13 +71,12 @@ class SeccionControllerTests {
 		response.reset()
 		response.format = "json"
 		
-        populateValidParams(params)
-        def seccion = new Seccion(params)
-        assert seccion.save() != null
+        def seccion = Seccion.build()
+		
+		assert seccion.save() != null
 
         params.id = seccion.id
 
-		mockDomain(Seccion, [seccion])
         controller.show()
 
         assert response.status == 200
@@ -90,20 +94,19 @@ class SeccionControllerTests {
 	void testUpdateInvalido(){
 		request.method = "PUT"
 
-        populateValidParams(params)
-        def seccion = new Seccion(params)
-        assert seccion.save() != null
+        def seccion = Seccion.build()
+		
+		assert seccion.save() != null
 
-        // test invalid parameters in update
+        // Probar actualizar con parametros no-validos
         params.id = seccion.id
-         	 params.evento = '' 
- 	 	 params.img = '' 
- 	 	 params.nombre = '' 
+         	 	 params.evento = '' 
+ 	 	 	 params.img = '' 
+ 	 	 	 params.nombre = '' 
  	
 
 		request.setJson(params as JSON)
 		
-		mockDomain(Seccion, [seccion])
 		response.format = "json"
         controller.update()
 
@@ -116,14 +119,13 @@ class SeccionControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def seccion = new Seccion(params)
+        def seccion = Seccion.build()
+		
 		assert seccion.save() != null
 		
 		params.id = seccion.id
 		
 		request.setJson(params as JSON)
-		
-		mockDomain(Seccion, [seccion])
 		
 		controller.update()
 
@@ -136,15 +138,16 @@ class SeccionControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def seccion = new Seccion(params)
+		def seccion = Seccion.build()
+		
+		assert seccion.save() != null
+		
 		seccion.version = 1
 		assert seccion.save() != null
 		
         params.id = seccion.id
         params.version = -1
         request.setJson(params as JSON)
-		
-		mockDomain(Seccion, [seccion])
 		
 		controller.update()
 
@@ -161,14 +164,13 @@ class SeccionControllerTests {
 
         response.reset()
 
-        populateValidParams(params)
-        def seccion = new Seccion(params)
-        assert seccion.save() != null
+        def seccion = Seccion.build()
+		
+		assert seccion.save() != null
 
         params.id = seccion.id
 		request.setJson(params as JSON)
 		
-		mockDomain(Seccion, [seccion])
 		response.format = "json"
         controller.delete()
 

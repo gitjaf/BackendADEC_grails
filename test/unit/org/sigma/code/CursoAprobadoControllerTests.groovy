@@ -7,27 +7,23 @@ import grails.test.mixin.*
 import grails.converters.JSON
 import grails.buildtestdata.mixin.Build
 
-@TestFor(UsuarioController)
-@Build(Usuario)
-class UsuarioControllerTests {
+@TestFor(CursoAprobadoController)
+@Build(CursoAprobado)
+class CursoAprobadoControllerTests {
 
     def populateValidParams(params) {
-	    	 params['apellido'] = 'valid_apellido'
-  	 	 params['direccion'] = 'valid_direccion'
-  	 	 params['email'] = 'valid_email'
-  	 	 params['empresa'] = 'valid_empresa'
-  	 	 params['nombre'] = 'valid_nombre'
-  	 	 params['password'] = 'valid_password'
-  	 	 params['telefono'] = 'valid_telefono'
-  	 	 params['username'] = 'valid_username'
-  	 
+	    	 params['fechaFinalizacion'] = '2012-10-20' 
+  	
   
-  			 	 def localidad = Localidad.build()
-	 	 assert localidad.save() != null
-	 	 params['localidad'] = localidad
-	 	 def perfil = Perfil.build()
-	 	 assert perfil.save() != null
-	 	 params['perfil'] = perfil
+  			 	 def candidato = Candidato.build()
+	 	 assert candidato.save() != null
+	 	 params['candidato'] = candidato
+	 	 def curso = Curso.build()
+	 	 assert curso.save() != null
+	 	 params['curso'] = curso
+	 	 def institucion = Institucion.build()
+	 	 assert institucion.save() != null
+	 	 params['institucion'] = institucion
 
 	  assert params != null
 	  
@@ -35,15 +31,15 @@ class UsuarioControllerTests {
 
     void testIndex() {
         controller.index()
-        assert "/usuario/list" == response.redirectedUrl
+        assert "/cursoAprobado/list" == response.redirectedUrl
     }
 
     void testList() {
 		request.method = "GET"
 		
-        def usuario = Usuario.build()
+        def cursoAprobado = CursoAprobado.build()
 		
-		assert usuario.save() != null
+		assert cursoAprobado.save() != null
 		
 		response.format = "json"
 		
@@ -63,8 +59,9 @@ class UsuarioControllerTests {
 		response.reset()
 		
         populateValidParams(params)
-			 	 params.idLocalidad = params.localidad.id
-	 	 params.idPerfil = params.perfil.id
+			 	 params.idCandidato = params.candidato.id
+	 	 params.idCurso = params.curso.id
+	 	 params.idInstitucion = params.institucion.id
 
         request.setJson(params as JSON)
 		
@@ -84,11 +81,11 @@ class UsuarioControllerTests {
 		response.reset()
 		response.format = "json"
 		
-        def usuario = Usuario.build()
+        def cursoAprobado = CursoAprobado.build()
 		
-		assert usuario.save() != null
+		assert cursoAprobado.save() != null
 
-        params.id = usuario.id
+        params.id = cursoAprobado.id
 
         controller.show()
 
@@ -107,19 +104,16 @@ class UsuarioControllerTests {
 	void testUpdateInvalido(){
 		request.method = "PUT"
 
-        def usuario = Usuario.build()
+        def cursoAprobado = CursoAprobado.build()
 		
-		assert usuario.save() != null
+		assert cursoAprobado.save() != null
 
         // Probar actualizar con parametros no-validos
-        params.id = usuario.id
-         	 	 params.apellido = '' 
- 	 	 	 params.email = '' 
- 	 	 	 params.localidad = '' 
- 	 	 	 params.nombre = '' 
- 	 	 	 params.password = '' 
- 	 	 	 params.perfil = '' 
- 	 	 	 params.username = '' 
+        params.id = cursoAprobado.id
+         	 	 params.candidato = '' 
+ 	 	 	 params.curso = '' 
+ 	 	 	 params.fechaFinalizacion = '' 
+ 	 	 	 params.institucion = '' 
  	
 
 		request.setJson(params as JSON)
@@ -136,11 +130,11 @@ class UsuarioControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def usuario = Usuario.build()
+        def cursoAprobado = CursoAprobado.build()
 		
-		assert usuario.save() != null
+		assert cursoAprobado.save() != null
 		
-		params.id = usuario.id
+		params.id = cursoAprobado.id
 		
 		request.setJson(params as JSON)
 		
@@ -155,14 +149,14 @@ class UsuarioControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def usuario = Usuario.build()
+		def cursoAprobado = CursoAprobado.build()
 		
-		assert usuario.save() != null
+		assert cursoAprobado.save() != null
 		
-		usuario.version = 1
-		assert usuario.save() != null
+		cursoAprobado.version = 1
+		assert cursoAprobado.save() != null
 		
-        params.id = usuario.id
+        params.id = cursoAprobado.id
         params.version = -1
         request.setJson(params as JSON)
 		
@@ -181,18 +175,18 @@ class UsuarioControllerTests {
 
         response.reset()
 
-        def usuario = Usuario.build()
+        def cursoAprobado = CursoAprobado.build()
 		
-		assert usuario.save() != null
+		assert cursoAprobado.save() != null
 
-        params.id = usuario.id
+        params.id = cursoAprobado.id
 		request.setJson(params as JSON)
 		
 		response.format = "json"
         controller.delete()
 
-        assert Usuario.count() == 0
-        assert Usuario.get(usuario.id) == null
+        assert CursoAprobado.count() == 0
+        assert CursoAprobado.get(cursoAprobado.id) == null
         assert response.status == 200
 		assert flash.message != null
     }

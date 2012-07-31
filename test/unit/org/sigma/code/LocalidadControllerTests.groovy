@@ -5,16 +5,20 @@ package org.sigma.code
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
+import grails.buildtestdata.mixin.Build
 
 @TestFor(LocalidadController)
-@Mock(Localidad)
+@Build(Localidad)
 class LocalidadControllerTests {
 
     def populateValidParams(params) {
-      	 params['codigoPostal'] = 'valid_codigoPostal'
+	    	 params['caracteristica'] = 'valid_caracteristica'
+  	 	 params['codigoPostal'] = 'valid_codigoPostal'
   	 	 params['nombre'] = 'valid_nombre'
   	 	 params['provincia'] = 'valid_provincia'
   	 
+  
+  		
 	  assert params != null
 	  
     }
@@ -26,9 +30,9 @@ class LocalidadControllerTests {
 
     void testList() {
 		request.method = "GET"
-		populateValidParams(params)
 		
-        def localidad = new Localidad(params)
+        def localidad = Localidad.build()
+		
 		assert localidad.save() != null
 		
 		response.format = "json"
@@ -41,15 +45,17 @@ class LocalidadControllerTests {
 
     void testSave() {
 		request.method = "POST"
-        controller.save()
+		response.format = "json"
+        
+		controller.save()
 
         assert response.status == 500
-		
-        response.reset()
-		response.format = "json"
+		response.reset()
 		
         populateValidParams(params)
+		
         request.setJson(params as JSON)
+		
 		controller.save()
 
         assert response.status == 201
@@ -66,13 +72,12 @@ class LocalidadControllerTests {
 		response.reset()
 		response.format = "json"
 		
-        populateValidParams(params)
-        def localidad = new Localidad(params)
-        assert localidad.save() != null
+        def localidad = Localidad.build()
+		
+		assert localidad.save() != null
 
         params.id = localidad.id
 
-		mockDomain(Localidad, [localidad])
         controller.show()
 
         assert response.status == 200
@@ -90,19 +95,19 @@ class LocalidadControllerTests {
 	void testUpdateInvalido(){
 		request.method = "PUT"
 
-        populateValidParams(params)
-        def localidad = new Localidad(params)
-        assert localidad.save() != null
+        def localidad = Localidad.build()
+		
+		assert localidad.save() != null
 
-        // test invalid parameters in update
+        // Probar actualizar con parametros no-validos
         params.id = localidad.id
-         	 params.nombre = '' 
- 	 	 params.provincia = '' 
+         	 	 params.caracteristica = '' 
+ 	 	 	 params.nombre = '' 
+ 	 	 	 params.provincia = '' 
  	
 
 		request.setJson(params as JSON)
 		
-		mockDomain(Localidad, [localidad])
 		response.format = "json"
         controller.update()
 
@@ -115,14 +120,13 @@ class LocalidadControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def localidad = new Localidad(params)
+        def localidad = Localidad.build()
+		
 		assert localidad.save() != null
 		
 		params.id = localidad.id
 		
 		request.setJson(params as JSON)
-		
-		mockDomain(Localidad, [localidad])
 		
 		controller.update()
 
@@ -135,15 +139,16 @@ class LocalidadControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def localidad = new Localidad(params)
+		def localidad = Localidad.build()
+		
+		assert localidad.save() != null
+		
 		localidad.version = 1
 		assert localidad.save() != null
 		
         params.id = localidad.id
         params.version = -1
         request.setJson(params as JSON)
-		
-		mockDomain(Localidad, [localidad])
 		
 		controller.update()
 
@@ -160,14 +165,13 @@ class LocalidadControllerTests {
 
         response.reset()
 
-        populateValidParams(params)
-        def localidad = new Localidad(params)
-        assert localidad.save() != null
+        def localidad = Localidad.build()
+		
+		assert localidad.save() != null
 
         params.id = localidad.id
 		request.setJson(params as JSON)
 		
-		mockDomain(Localidad, [localidad])
 		response.format = "json"
         controller.delete()
 

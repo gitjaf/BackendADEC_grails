@@ -5,15 +5,18 @@ package org.sigma.code
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
+import grails.buildtestdata.mixin.Build
 
 @TestFor(CampoTablaController)
-@Mock([CampoTabla, Usuario, Perfil])
+@Build(CampoTabla)
 class CampoTablaControllerTests {
 
     def populateValidParams(params) {
-      	 params['descripcion'] = 'valid_descripcion'
+	    	 params['descripcion'] = 'valid_descripcion'
   	 	 params['nombre'] = 'valid_nombre'
   	 
+  
+  		
 	  assert params != null
 	  
     }
@@ -25,9 +28,9 @@ class CampoTablaControllerTests {
 
     void testList() {
 		request.method = "GET"
-		populateValidParams(params)
 		
-        def campoTabla = new CampoTabla(params)
+        def campoTabla = CampoTabla.build()
+		
 		assert campoTabla.save() != null
 		
 		response.format = "json"
@@ -40,15 +43,17 @@ class CampoTablaControllerTests {
 
     void testSave() {
 		request.method = "POST"
-        controller.save()
+		response.format = "json"
+        
+		controller.save()
 
         assert response.status == 500
-		
-        response.reset()
-		response.format = "json"
+		response.reset()
 		
         populateValidParams(params)
+		
         request.setJson(params as JSON)
+		
 		controller.save()
 
         assert response.status == 201
@@ -65,13 +70,12 @@ class CampoTablaControllerTests {
 		response.reset()
 		response.format = "json"
 		
-        populateValidParams(params)
-        def campoTabla = new CampoTabla(params)
-        assert campoTabla.save() != null
+        def campoTabla = CampoTabla.build()
+		
+		assert campoTabla.save() != null
 
         params.id = campoTabla.id
 
-		mockDomain(CampoTabla, [campoTabla])
         controller.show()
 
         assert response.status == 200
@@ -89,19 +93,18 @@ class CampoTablaControllerTests {
 	void testUpdateInvalido(){
 		request.method = "PUT"
 
-        populateValidParams(params)
-        def campoTabla = new CampoTabla(params)
-        assert campoTabla.save() != null
+        def campoTabla = CampoTabla.build()
+		
+		assert campoTabla.save() != null
 
-        // test invalid parameters in update
+        // Probar actualizar con parametros no-validos
         params.id = campoTabla.id
-         	 params.descripcion = '' 
- 	 	 params.nombre = '' 
+         	 	 params.descripcion = '' 
+ 	 	 	 params.nombre = '' 
  	
 
 		request.setJson(params as JSON)
 		
-		mockDomain(CampoTabla, [campoTabla])
 		response.format = "json"
         controller.update()
 
@@ -114,14 +117,13 @@ class CampoTablaControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def campoTabla = new CampoTabla(params)
+        def campoTabla = CampoTabla.build()
+		
 		assert campoTabla.save() != null
 		
 		params.id = campoTabla.id
 		
 		request.setJson(params as JSON)
-		
-		mockDomain(CampoTabla, [campoTabla])
 		
 		controller.update()
 
@@ -134,15 +136,16 @@ class CampoTablaControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def campoTabla = new CampoTabla(params)
+		def campoTabla = CampoTabla.build()
+		
+		assert campoTabla.save() != null
+		
 		campoTabla.version = 1
 		assert campoTabla.save() != null
 		
         params.id = campoTabla.id
         params.version = -1
         request.setJson(params as JSON)
-		
-		mockDomain(CampoTabla, [campoTabla])
 		
 		controller.update()
 
@@ -159,14 +162,13 @@ class CampoTablaControllerTests {
 
         response.reset()
 
-        populateValidParams(params)
-        def campoTabla = new CampoTabla(params)
-        assert campoTabla.save() != null
+        def campoTabla = CampoTabla.build()
+		
+		assert campoTabla.save() != null
 
         params.id = campoTabla.id
 		request.setJson(params as JSON)
 		
-		mockDomain(CampoTabla, [campoTabla])
 		response.format = "json"
         controller.delete()
 

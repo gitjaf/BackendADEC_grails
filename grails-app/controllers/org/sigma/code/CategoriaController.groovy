@@ -4,6 +4,8 @@ package org.sigma.code
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
 
+
+
 class CategoriaController {
 
     static allowedMethods = [show: ["GET", "POST"], save: "POST", update: "PUT", delete: "DELETE"]
@@ -15,41 +17,44 @@ class CategoriaController {
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
 		
-		def novedad_SidebarInstanceList = Categoria.list()
+		def categoriaInstanceList = Categoria.list()
 		
 		response.status = 200
 		
-		render novedad_SidebarInstanceList as JSON
+		render categoriaInstanceList as JSON
     }
     
     def save() {
-        def novedad_SidebarInstance = new Categoria(request.JSON)
-        if (!novedad_SidebarInstance.save(flush: true)) {
+        def categoriaInstance = new Categoria(request.JSON)
+		
+		
+        
+		if (!categoriaInstance.save(flush: true)) {
 			response.status = 500
 			return
         }
 
-		flash.message = message(code: 'default.created.message', args: [message(code: 'novedad_Sidebar.label', default: 'Novedad_Sidebar'), novedad_SidebarInstance.id])
+		flash.message = message(code: 'default.created.message', args: [message(code: 'categoria.label', default: 'Categoria'), categoriaInstance.id])
         response.status = 201
-		render novedad_SidebarInstance as JSON
+		render categoriaInstance as JSON
     }
 
     def show() {
-        def novedad_SidebarInstance = Categoria.get(params.id)
-        if (!novedad_SidebarInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'novedad_Sidebar.label', default: 'Novedad_Sidebar'), params.id])
+        def categoriaInstance = Categoria.get(params.id)
+        if (!categoriaInstance) {
+			flash.message = message(code: 'default.not.found.message', args: [message(code: 'categoria.label', default: 'Categoria'), params.id])
             response.status = 404
 			render flash.message
             return
         }
 		response.status = 200
-        render novedad_SidebarInstance as JSON
+        render categoriaInstance as JSON
     }
 
     def update() {
-        def novedad_SidebarInstance = Categoria.get(params.id)
-        if (!novedad_SidebarInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'novedad_Sidebar.label', default: 'Novedad_Sidebar'), params.id])
+        def categoriaInstance = Categoria.get(params.id)
+        if (!categoriaInstance) {
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'categoria.label', default: 'Categoria'), params.id])
             response.status = 404
 			render flash.message
             return
@@ -57,43 +62,45 @@ class CategoriaController {
 
         if (request.JSON.version) {
             def version = request.JSON.version.toLong()
-            if (novedad_SidebarInstance.version > version) {
-				flash.message = message(code: 'default.optimistic.locking.failure', args: [message(code: 'novedad_Sidebar.label', default: 'Novedad_Sidebar'), novedad_SidebarInstance.id])
+            if (categoriaInstance.version > version) {
+				flash.message = message(code: 'default.optimistic.locking.failure', args: [message(code: 'categoria.label', default: 'Categoria'), categoriaInstance.id])
                 response.status = 409
                 return
             }
         }
 
-        novedad_SidebarInstance.properties = request.JSON
-
-        if (!novedad_SidebarInstance.save(flush: true)) {
+        categoriaInstance.properties = request.JSON
+		
+		
+		
+        if (!categoriaInstance.save(flush: true)) {
             response.status = 500
-			render novedad_SidebarInstance as JSON
+			render categoriaInstance as JSON
             return
         }
 
-		flash.message = message(code: 'default.updated.message', args: [message(code: 'novedad_Sidebar.label', default: 'Novedad_Sidebar'), novedad_SidebarInstance.id])
+		flash.message = message(code: 'default.updated.message', args: [message(code: 'categoria.label', default: 'Categoria'), categoriaInstance.id])
 		response.status = 200
-        render novedad_SidebarInstance as JSON
+        render categoriaInstance as JSON
     }
 
     def delete() {
-        def novedad_SidebarInstance = Categoria.get(params.id)
-        if (!novedad_SidebarInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'novedad_Sidebar.label', default: 'Novedad_Sidebar'), params.id])
+        def categoriaInstance = Categoria.get(params.id)
+        if (!categoriaInstance) {
+			flash.message = message(code: 'default.not.found.message', args: [message(code: 'categoria.label', default: 'Categoria'), params.id])
             response.status = 404
 			render flash.message
             return
         }
 
         try {
-            novedad_SidebarInstance.delete(flush: true)
-			flash.message = message(code: 'default.deleted.message', args: [message(code: 'novedad_Sidebar.label', default: 'Novedad_Sidebar'), params.id])
+            categoriaInstance.delete(flush: true)
+			flash.message = message(code: 'default.deleted.message', args: [message(code: 'categoria.label', default: 'Categoria'), params.id])
             response.status = 200
 			render flash.message
         }
         catch (DataIntegrityViolationException e) {
-			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'novedad_Sidebar.label', default: 'Novedad_Sidebar'), params.id])
+			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'categoria.label', default: 'Categoria'), params.id])
             response.status = 500
 			render flash.message
         }

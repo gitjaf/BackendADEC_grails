@@ -1,9 +1,10 @@
 
 package org.sigma.code
 
-import org.apache.catalina.connector.Request;
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
+
+
 
 class TabController {
 
@@ -25,9 +26,12 @@ class TabController {
     
     def save() {
         def tabInstance = new Tab(request.JSON)
-		request.JSON.idCampos?.each {id -> tabInstance.campos.add(CampoTabla.get(id))}
 		
-        if (!tabInstance.save(flush: true)) {
+			 	 request.JSON?.idCampos?.each{ id -> tabInstance.addToCampos(CampoTabla.get(id))} 
+
+
+        
+		if (!tabInstance.save(flush: true)) {
 			response.status = 500
 			return
         }
@@ -69,11 +73,13 @@ class TabController {
 
         tabInstance.properties = request.JSON
 		
-		tabInstance?.campos.clear()
-		if(request.JSON?.idCampos){
-			request.JSON.idCampos.each {id -> tabInstance.campos.add(CampoTabla.get(id))}
-		}
+		 	 	 if(request.JSON?.idCampos || request.JSON?.idCampos?.isEmpty()){ 
+	 	 	 tabInstance.campos?.clear() 
+	 	 	 request.JSON.idCampos.each{id -> tabInstance.addToCampos(CampoTabla.get(id))} 
+	 	} 
 
+
+		
         if (!tabInstance.save(flush: true)) {
             response.status = 500
 			render tabInstance as JSON

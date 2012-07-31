@@ -5,6 +5,8 @@ class Institucion {
 	String nombre
 	String domicilio
 	
+	Localidad localidad
+	
 	static hasMany = [cursos : Curso]
 	
     static constraints = {

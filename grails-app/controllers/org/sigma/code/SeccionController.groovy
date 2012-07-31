@@ -4,6 +4,8 @@ package org.sigma.code
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
 
+
+
 class SeccionController {
 
     static allowedMethods = [show: ["GET", "POST"], save: "POST", update: "PUT", delete: "DELETE"]
@@ -24,7 +26,10 @@ class SeccionController {
     
     def save() {
         def seccionInstance = new Seccion(request.JSON)
-        if (!seccionInstance.save(flush: true)) {
+		
+		
+        
+		if (!seccionInstance.save(flush: true)) {
 			response.status = 500
 			return
         }
@@ -65,7 +70,9 @@ class SeccionController {
         }
 
         seccionInstance.properties = request.JSON
-
+		
+		
+		
         if (!seccionInstance.save(flush: true)) {
             response.status = 500
 			render seccionInstance as JSON

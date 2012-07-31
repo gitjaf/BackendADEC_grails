@@ -3,21 +3,32 @@
 import org.junit.*
 import grails.test.mixin.*
 import grails.converters.JSON
+import grails.buildtestdata.mixin.Build
 
 @TestFor(${className}Controller)
-@Mock(${className})
+@Build(${className})
 class ${className}ControllerTests {
 
     def populateValidParams(params) {
-      <%domainClass.properties.each{
-		  print ((it.type == String.class)? "\t params['${it.name}'] = 'valid_${it.name}'\n  \t " :
-		  (it.type == Boolean.class)? "\t params['${it.name}'] = ${true} \n  \t" : 
-		  (it.type == Date.class)? "\t params['${it.name}'] = '22/01/2012' \n  \t" :
-		  (it.type == Long.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1} \n  \t " :
-		  (it.type == Integer.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1} \n  \t " :
-		  (it.type == Double.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1.0d} \n  \t " :
-		  (it.type == Float.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1.0f} \n  \t " : "")
-	  }%>
+	    <%
+			def cantFechas = 0
+			domainClass.properties.each{
+				print ((it.type == String.class)? "\t params['${it.name}'] = 'valid_${it.name}'\n  \t " :
+				(it.type == Boolean.class)? "\t params['${it.name}'] = ${true} \n  \t" : 
+				(it.type == Date.class)? "\t params['${it.name}'] = '2012-10-20' \n  \t" :
+				(it.type == Long.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1} \n  \t " :
+				(it.type == Integer.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1} \n  \t " :
+				(it.type == Double.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1.0d} \n  \t " :
+				(it.type == Float.class & it.name != "id" & it.name != "version")? "\t params['${it.name}'] = ${1.0f} \n  \t " : "")
+		}%>
+  
+  		<%
+		  	domainClass.persistentProperties.findAll {it.isOneToOne() || it.isManyToOne()}.each{
+			  println "\t \t def ${it.name} = ${it.type.getSimpleName()}.build()"
+			  println "\t \t assert ${it.name}.save() != null"
+			  println "\t \t params['${it.name}'] = ${it.name}"
+			}
+		  %>
 	  assert params != null
 	  
     }
@@ -29,9 +40,9 @@ class ${className}ControllerTests {
 
     void testList() {
 		request.method = "GET"
-		populateValidParams(params)
 		
-        def ${propertyName} = new ${className}(params)
+        def ${propertyName} = ${className}.build()
+		
 		assert ${propertyName}.save() != null
 		
 		response.format = "json"
@@ -44,15 +55,21 @@ class ${className}ControllerTests {
 
     void testSave() {
 		request.method = "POST"
-        controller.save()
+		response.format = "json"
+        
+		controller.save()
 
         assert response.status == 500
-		
-        response.reset()
-		response.format = "json"
+		response.reset()
 		
         populateValidParams(params)
+		<% 
+			domainClass.persistentProperties.findAll {it.isOneToOne() || it.isManyToOne()}.each{
+				println "\t \t params.id${it.name.capitalize()} = params.${it.name}.id"
+			}
+		%>
         request.setJson(params as JSON)
+		
 		controller.save()
 
         assert response.status == 201
@@ -69,13 +86,12 @@ class ${className}ControllerTests {
 		response.reset()
 		response.format = "json"
 		
-        populateValidParams(params)
-        def ${propertyName} = new ${className}(params)
-        assert ${propertyName}.save() != null
+        def ${propertyName} = ${className}.build()
+		
+		assert ${propertyName}.save() != null
 
         params.id = ${propertyName}.id
 
-		mockDomain(${className}, [${propertyName}])
         controller.show()
 
         assert response.status == 200
@@ -93,19 +109,18 @@ class ${className}ControllerTests {
 	void testUpdateInvalido(){
 		request.method = "PUT"
 
-        populateValidParams(params)
-        def ${propertyName} = new ${className}(params)
-        assert ${propertyName}.save() != null
+        def ${propertyName} = ${className}.build()
+		
+		assert ${propertyName}.save() != null
 
-        // test invalid parameters in update
+        // Probar actualizar con parametros no-validos
         params.id = ${propertyName}.id
         <%domainClass.properties.each{
-		print((!it.optional & it.name != "id" & it.name != "version") ? " \t params.${it.name} = '' \n \t" : "" )
+			print((!it.optional & it.name != "id" & it.name != "version") ? " \t \t params.${it.name} = '' \n \t" : "" )
 		}%>
 
 		request.setJson(params as JSON)
 		
-		mockDomain(${className}, [${propertyName}])
 		response.format = "json"
         controller.update()
 
@@ -118,14 +133,13 @@ class ${className}ControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-        def ${propertyName} = new ${className}(params)
+        def ${propertyName} = ${className}.build()
+		
 		assert ${propertyName}.save() != null
 		
 		params.id = ${propertyName}.id
 		
 		request.setJson(params as JSON)
-		
-		mockDomain(${className}, [${propertyName}])
 		
 		controller.update()
 
@@ -138,15 +152,16 @@ class ${className}ControllerTests {
 		response.format = "json"
 		
         populateValidParams(params)
-		def ${propertyName} = new ${className}(params)
+		def ${propertyName} = ${className}.build()
+		
+		assert ${propertyName}.save() != null
+		
 		${propertyName}.version = 1
 		assert ${propertyName}.save() != null
 		
         params.id = ${propertyName}.id
         params.version = -1
         request.setJson(params as JSON)
-		
-		mockDomain(${className}, [${propertyName}])
 		
 		controller.update()
 
@@ -163,14 +178,13 @@ class ${className}ControllerTests {
 
         response.reset()
 
-        populateValidParams(params)
-        def ${propertyName} = new ${className}(params)
-        assert ${propertyName}.save() != null
+        def ${propertyName} = ${className}.build()
+		
+		assert ${propertyName}.save() != null
 
         params.id = ${propertyName}.id
 		request.setJson(params as JSON)
 		
-		mockDomain(${className}, [${propertyName}])
 		response.format = "json"
         controller.delete()
 
