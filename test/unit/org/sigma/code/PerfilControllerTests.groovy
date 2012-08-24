@@ -12,9 +12,7 @@ import grails.buildtestdata.mixin.Build
 class PerfilControllerTests {
 
     def populateValidParams(params) {
-	    	 params['descripcion'] = 'valid_descripcion'
-  	 
-  
+	  params['descripcion'] = 'valid_descripcion'
   		
 	  assert params != null
 	  
@@ -98,7 +96,7 @@ class PerfilControllerTests {
 
         // Probar actualizar con parametros no-validos
         params.id = perfil.id
-         	 	 params.descripcion = '' 
+        params.descripcion = '' 
  	
 
 		request.setJson(params as JSON)

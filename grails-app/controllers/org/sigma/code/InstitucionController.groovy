@@ -25,11 +25,11 @@ class InstitucionController {
     }
     
     def save() {
-        def institucionInstance = new Institucion(request.JSON)
+        def institucionInstance = new Institucion(request.JSON.institucion)
+				
+		institucionInstance.localidad = Localidad.get(request.JSON.institucion?.idLocalidad) 
 		
-			 	 institucionInstance.localidad = Localidad.get(request.JSON?.idLocalidad) 
- 
-
+		request.JSON?.idCursos?.each{ id -> institucionInstance.addToCursos(Curso.get(id))}
         
 		if (!institucionInstance.save(flush: true)) {
 			response.status = 500
@@ -73,9 +73,12 @@ class InstitucionController {
 
         institucionInstance.properties = request.JSON
 		
-			 	 institucionInstance.localidad = (request.JSON?.idLocalidad) ?  Localidad.get(request.JSON?.idLocalidad) : institucionInstance.localidad 
+		institucionInstance.localidad = (request.JSON?.idLocalidad) ?  Localidad.get(request.JSON?.idLocalidad) : institucionInstance.localidad 
  
-
+		if(request.JSON?.idCursos || request.JSON?.idCursos?.isEmpty()){
+			institucionInstance.cursos.clear()
+			request.JSON?.idCursos.each{id -> institucionInstance.addToCursos(Curso.get(id))}
+		}
 		
         if (!institucionInstance.save(flush: true)) {
             response.status = 500

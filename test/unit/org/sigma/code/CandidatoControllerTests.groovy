@@ -1,8 +1,7 @@
 package org.sigma.code
 
-
-
 import org.junit.*
+import grails.test.GrailsMock
 import grails.test.mixin.*
 import grails.converters.JSON
 import grails.buildtestdata.mixin.Build
@@ -58,17 +57,27 @@ class CandidatoControllerTests {
 		assert response.json.size() == 1
     }
 
-    void testSave() {
+    void testSaveFallido() {
 		request.method = "POST"
 		response.format = "json"
+		
+		def candidatoService = mockFor(CandidatoService.class)
+		candidatoService.demand.nuevoCandidato(1..2) {def json -> return new Candidato() }
+		controller.candidatoService = candidatoService.createMock()
         
 		controller.save()
 
         assert response.status == 500
-		response.reset()
+    }
+	
+	void testSaveValido() {
+		
+		def candidatoService = mockFor(CandidatoService.class)
+		candidatoService.demand.nuevoCandidato(1..2) {def json -> return Candidato.build() }
+		controller.candidatoService = candidatoService.createMock()
 		
         populateValidParams(params)
-			 	 params.idLocalidad = params.localidad.id
+		params.idLocalidad = params.localidad.id
 
         request.setJson(params as JSON)
 		

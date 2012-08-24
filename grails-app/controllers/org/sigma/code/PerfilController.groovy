@@ -81,7 +81,7 @@ class PerfilController {
 
         perfilInstance.properties = request.JSON
 		
-		 	 	 if(request.JSON?.idCategorias || request.JSON?.idCategorias?.isEmpty()){ 
+		 if(request.JSON?.idCategorias || request.JSON?.idCategorias?.isEmpty()){ 
 	 	 	 perfilInstance.categorias?.clear() 
 	 	 	 request.JSON.idCategorias.each{id -> perfilInstance.addToCategorias(Categoria.get(id))} 
 	 	} 

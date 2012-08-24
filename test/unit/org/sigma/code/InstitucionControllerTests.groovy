@@ -8,19 +8,17 @@ import grails.converters.JSON
 import grails.buildtestdata.mixin.Build
 
 @TestFor(InstitucionController)
-@Build(Institucion)
+@Build([Institucion, Curso])
 class InstitucionControllerTests {
 
     def populateValidParams(params) {
-	    	 params['domicilio'] = 'valid_domicilio'
-  	 	 params['nombre'] = 'valid_nombre'
-  	 
-  
-  			 	 def localidad = Localidad.build()
-	 	 assert localidad.save() != null
-	 	 params['localidad'] = localidad
-
-	  assert params != null
+		
+		def localidad = Localidad.build()
+		assert localidad.save() != null
+		
+		params["institucion"] = [nombre: "unNombre", idLocalidad: localidad.id]
+		
+		assert params != null
 	  
     }
 
@@ -54,8 +52,7 @@ class InstitucionControllerTests {
 		response.reset()
 		
         populateValidParams(params)
-			 	 params.idLocalidad = params.localidad.id
-
+		
         request.setJson(params as JSON)
 		
 		controller.save()
@@ -103,8 +100,8 @@ class InstitucionControllerTests {
 
         // Probar actualizar con parametros no-validos
         params.id = institucion.id
-         	 	 params.localidad = '' 
- 	 	 	 params.nombre = '' 
+        params.localidad = '' 
+ 	 	params.nombre = '' 
  	
 
 		request.setJson(params as JSON)
